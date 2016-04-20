@@ -67,7 +67,9 @@ function axis(opts){
     return axis;
   }
   window.d3 = d3;
+  window.axis = axis;
   var p;
+
   axis.font = function font(prop,val){
     var ticks = 0;
     var currDy = getTextElems().attr("dy");
@@ -76,7 +78,8 @@ function axis(opts){
       .duration(600)
       .attrTween("font-size",function(){
         ticks++;
-        return d3.interpolateString("10pt","38pt");
+
+        return d3.interpolateString("48pt",val);
       })
       .attrTween("dy",function(){
         return d3.interpolateString(".71em",".70999em");
