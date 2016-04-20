@@ -2,6 +2,12 @@ var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
 var horizontalResize = require('../behaviors/horizontalResize');
+var ee = require("event-emitter");
+var emitter = ee({});
+emitter.on('onTransitionFinshed',(time)=>{
+  console.log("this is the time",time);
+});
+
 var config = {
   svg: null,
   domain:null,
@@ -60,27 +66,35 @@ function axis(opts){
     return axis;
   }
   window.d3 = d3;
+  var p;
   axis.font = function font(prop,val){
+    var ticks = 0;
     var currDy = getTextElems().attr("dy");
     getTextElems()
       .transition()
-      .duration(2500)
+      .duration(600)
       .attrTween("font-size",function(){
-
-        return d3.interpolateString("10pt","16pt");
+        ticks++;
+        return d3.interpolateString("10pt","38pt");
       })
       .attrTween("dy",function(){
-        return d3.interpolateString(".71em",".81em");
+        return d3.interpolateString(".71em",".70999em");
       })
+      .attrTween("fill",function(){
+        return d3.interpolateString("yellow","blue");
+      })
+      .each("end",function(){
+        if(--ticks===0){
+          emitter.emit("onTransitionFinshed",+new Date());
+        }
+      });
+
     return axis;
   }
-
-
   render();
   return axis;
 }
-setTimeout(function(){
+
   axis({
     id: '#svg'
-  }).font('font-size','24pt');
-},1000)
+  }).font('font-size','48pt');
