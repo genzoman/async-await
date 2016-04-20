@@ -32,7 +32,8 @@ function axis(opts){
 
   let getAxis = ()=> d3.svg.axis().scale(getScale()).orient(config.orient);
 
-  
+console.log("hello world");
+
 
   let render = ()=>{
     if(!d3.select('#xAxis').size()){
