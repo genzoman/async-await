@@ -20,7 +20,7 @@ var config = {
 
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-let getTextElems = ()=> d3.select(".x").selectAll("text");
+let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
 
 function axis(opts){
   config = getConfig(config,opts);
@@ -32,7 +32,7 @@ function axis(opts){
 
   let getAxis = ()=> d3.svg.axis().scale(getScale()).orient(config.orient);
 
-console.log("hello world");
+
 
 
   let render = ()=>{
@@ -59,18 +59,28 @@ console.log("hello world");
     config.group.call(drag);
     return axis;
   }
+  window.d3 = d3;
+  axis.font = function font(prop,val){
+    var currDy = getTextElems().attr("dy");
+    getTextElems()
+      .transition()
+      .duration(2500)
+      .attrTween("font-size",function(){
+
+        return d3.interpolateString("10pt","16pt");
+      })
+      .attrTween("dy",function(){
+        return d3.interpolateString(".71em",".81em");
+      })
+    return axis;
+  }
+
 
   render();
   return axis;
 }
-axis({
-  id: '#svg'
-}).drag({
-  "dragstart":()=>{},
-  "drag":function shrink(){
-    axis({
-      width: horizontalResize.call(this,{width:config.width})
-    });
-  },
-  "dragend":()=>{}
-})
+setTimeout(function(){
+  axis({
+    id: '#svg'
+  }).font('font-size','24pt');
+},1000)
