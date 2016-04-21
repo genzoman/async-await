@@ -4,6 +4,7 @@ var mouse;
 
 
   function verticalResize(config){
+    
     mouse = d3.mouse(this);
 
 
