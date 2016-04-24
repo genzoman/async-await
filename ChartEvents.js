@@ -14,8 +14,8 @@ emitter.on('onButtonClick',(time)=>{
 emitter.on('onFontChange',function(data){
   axis(data);
 });
-emitter.on('onFontBold',function(){
-
+emitter.on('onAxisToggle',function(data){
+  axis(data);
 });
 
 module.exports = emitter;

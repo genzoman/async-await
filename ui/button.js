@@ -1,14 +1,17 @@
 var d3 = require("d3");
 var ee = require("event-emitter");
 var emitter = require("../ChartEvents");
-
+var checkbox = require("./checkbox");
+checkbox();
 var button = d3.select("body")
   .append("div")
   .text("CLICK 121ME")
   .on("click",function(){
   emitter.emit("onFontChange",{
-    'font-size': '11pt',
-    'fill': 'purple'
+    font:{
+      'font-size': '15pt',
+      'fill': 'green'
+    }
   });
 });
 /*

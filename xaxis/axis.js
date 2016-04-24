@@ -15,7 +15,8 @@ var config = {
   data: [1,2,3,4],
   drag: null,
   group: '',
-  orient: 'bottom'
+  orient: 'bottom',
+  enable: true
 }
 
 let getDomain = (data,key)=> config.data;
@@ -30,16 +31,23 @@ function axis(opts){
       .rangeRoundBands([0,config.width],config.barPadding || .1);
   }
 
-  let getAxis = ()=> d3.svg.axis().scale(getScale()).orient(config.orient);
+  let getAxis = ()=> {
+    return d3.svg.axis().scale(getScale()).orient(config.orient);
+  }
+
 
   let render = ()=>{
     if(!d3.select('#xAxis').size()){
-        config.group = d3.select(config.id)
+      config.group = d3.select(config.id)
           .append("g")
           .attr("id","xAxis")
-          .attr("transform",translate(100,100));
+          .attr("transform",translate(100,100))
+
+      if(!config.enable){
+        config.group.style("display","none");
+      }
     }
-    config.group.call(getAxis());
+    config.group.call(getAxis()).style("display", config.enable ? null: "none");
     for(let prop in config.font){
       getTextElems().attr(prop,config.font[prop]);
     }

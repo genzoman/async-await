@@ -15,13 +15,13 @@ emitter.on('onButtonClick',(time)=>{
 emitter.on('onFontChange',function(data){
   axis(data);
 });
-emitter.on('onFontBold',function(){
-
+emitter.on('onAxisToggle',function(data){
+  axis(data);
 });
 
 module.exports = emitter;
 
-},{"./xaxis/axis":5,"event-emitter":21}],2:[function(require,module,exports){
+},{"./xaxis/axis":6,"event-emitter":22}],2:[function(require,module,exports){
 var d3 = require('d3');
 var translate = require("../utils/translate");
 module.exports = horizontalResize;
@@ -50,18 +50,21 @@ function horizontalResize(config){
   return getWidth();
 }
 
-},{"../utils/translate":4,"d3":7}],3:[function(require,module,exports){
+},{"../utils/translate":5,"d3":8}],3:[function(require,module,exports){
 var d3 = require("d3");
 var ee = require("event-emitter");
 var emitter = require("../ChartEvents");
-
+var checkbox = require("./checkbox");
+checkbox();
 var button = d3.select("body")
   .append("div")
   .text("CLICK 121ME")
   .on("click",function(){
   emitter.emit("onFontChange",{
-    'font-size': '11pt',
-    'fill': 'purple'
+    font:{
+      'font-size': '15pt',
+      'fill': 'green'
+    }
   });
 });
 /*
@@ -77,13 +80,30 @@ var button = d3.select("body")
 
 */
 
-},{"../ChartEvents":1,"d3":7,"event-emitter":21}],4:[function(require,module,exports){
+},{"../ChartEvents":1,"./checkbox":4,"d3":8,"event-emitter":22}],4:[function(require,module,exports){
+const d3 = require("d3");
+var emitter = require("../ChartEvents");
+let binding = {
+  enable:true
+}
+
+
+function checkbox(){
+  return d3.select("body").append("input").attr("type","checkbox")
+    .on("change",function(){
+      binding.enable = !binding.enable;
+      emitter.emit("onAxisToggle",binding);
+    });
+}
+module.exports = checkbox;
+
+},{"../ChartEvents":1,"d3":8}],5:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
 }
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
@@ -101,7 +121,8 @@ var config = {
   data: [1,2,3,4],
   drag: null,
   group: '',
-  orient: 'bottom'
+  orient: 'bottom',
+  enable: true
 }
 
 let getDomain = (data,key)=> config.data;
@@ -116,16 +137,23 @@ function axis(opts){
       .rangeRoundBands([0,config.width],config.barPadding || .1);
   }
 
-  let getAxis = ()=> d3.svg.axis().scale(getScale()).orient(config.orient);
+  let getAxis = ()=> {
+    return d3.svg.axis().scale(getScale()).orient(config.orient);
+  }
+
 
   let render = ()=>{
     if(!d3.select('#xAxis').size()){
-        config.group = d3.select(config.id)
+      config.group = d3.select(config.id)
           .append("g")
           .attr("id","xAxis")
-          .attr("transform",translate(100,100));
+          .attr("transform",translate(100,100))
+
+      if(!config.enable){
+        config.group.style("display","none");
+      }
     }
-    config.group.call(getAxis());
+    config.group.call(getAxis()).style("display", config.enable ? null: "none");
     for(let prop in config.font){
       getTextElems().attr(prop,config.font[prop]);
     }
@@ -160,7 +188,7 @@ let shrink = ()=>{
 
 }
 
-},{"../behaviors/horizontalResize":2,"../utils/translate":4,"d3":7,"underscore":22}],6:[function(require,module,exports){
+},{"../behaviors/horizontalResize":2,"../utils/translate":5,"d3":8,"underscore":23}],7:[function(require,module,exports){
 'use strict';
 
 var assign        = require('es5-ext/object/assign')
@@ -225,7 +253,7 @@ d.gs = function (dscr, get, set/*, options*/) {
 	return !options ? desc : assign(normalizeOpts(options), desc);
 };
 
-},{"es5-ext/object/assign":8,"es5-ext/object/is-callable":11,"es5-ext/object/normalize-options":15,"es5-ext/string/#/contains":18}],7:[function(require,module,exports){
+},{"es5-ext/object/assign":9,"es5-ext/object/is-callable":12,"es5-ext/object/normalize-options":16,"es5-ext/string/#/contains":19}],8:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -9780,14 +9808,14 @@ d.gs = function (dscr, get, set/*, options*/) {
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? Object.assign
 	: require('./shim');
 
-},{"./is-implemented":9,"./shim":10}],9:[function(require,module,exports){
+},{"./is-implemented":10,"./shim":11}],10:[function(require,module,exports){
 'use strict';
 
 module.exports = function () {
@@ -9798,7 +9826,7 @@ module.exports = function () {
 	return (obj.foo + obj.bar + obj.trzy) === 'razdwatrzy';
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var keys  = require('../keys')
@@ -9822,21 +9850,21 @@ module.exports = function (dest, src/*, …srcn*/) {
 	return dest;
 };
 
-},{"../keys":12,"../valid-value":17}],11:[function(require,module,exports){
+},{"../keys":13,"../valid-value":18}],12:[function(require,module,exports){
 // Deprecated
 
 'use strict';
 
 module.exports = function (obj) { return typeof obj === 'function'; };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? Object.keys
 	: require('./shim');
 
-},{"./is-implemented":13,"./shim":14}],13:[function(require,module,exports){
+},{"./is-implemented":14,"./shim":15}],14:[function(require,module,exports){
 'use strict';
 
 module.exports = function () {
@@ -9846,7 +9874,7 @@ module.exports = function () {
 	} catch (e) { return false; }
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 var keys = Object.keys;
@@ -9855,7 +9883,7 @@ module.exports = function (object) {
 	return keys(object == null ? object : Object(object));
 };
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var forEach = Array.prototype.forEach, create = Object.create;
@@ -9874,7 +9902,7 @@ module.exports = function (options/*, …options*/) {
 	return result;
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 module.exports = function (fn) {
@@ -9882,7 +9910,7 @@ module.exports = function (fn) {
 	return fn;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = function (value) {
@@ -9890,14 +9918,14 @@ module.exports = function (value) {
 	return value;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? String.prototype.contains
 	: require('./shim');
 
-},{"./is-implemented":19,"./shim":20}],19:[function(require,module,exports){
+},{"./is-implemented":20,"./shim":21}],20:[function(require,module,exports){
 'use strict';
 
 var str = 'razdwatrzy';
@@ -9907,7 +9935,7 @@ module.exports = function () {
 	return ((str.contains('dwa') === true) && (str.contains('foo') === false));
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 var indexOf = String.prototype.indexOf;
@@ -9916,7 +9944,7 @@ module.exports = function (searchString/*, position*/) {
 	return indexOf.call(this, searchString, arguments[1]) > -1;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 var d        = require('d')
@@ -10050,7 +10078,7 @@ module.exports = exports = function (o) {
 };
 exports.methods = methods;
 
-},{"d":6,"es5-ext/object/valid-callable":16}],22:[function(require,module,exports){
+},{"d":7,"es5-ext/object/valid-callable":17}],23:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
