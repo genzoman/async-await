@@ -2,6 +2,8 @@ var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
 var horizontalResize = require('../behaviors/horizontalResize');
+var emitter = require("../ChartEvents");
+
 var config = {
   svg: null,
   domain:null,
@@ -21,8 +23,8 @@ var config = {
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
-module.exports = axis;
-function axis(opts){
+
+function bars(opts){
   config = getConfig(config,opts);
 
   let getScale = ()=>{
@@ -31,6 +33,33 @@ function axis(opts){
   }
 
   let getAxis = ()=> d3.svg.axis().scale(getScale()).orient(config.orient);
+
+  axis.font = function font(prop,val){
+    var ticks = 0;
+    var currDy = getTextElems().attr("dy");
+    getTextElems()
+      .transition()
+      .duration(600)
+      .attrTween("font-size",function(){
+        ticks++;
+
+        return d3.interpolateString("48pt",val);
+      })
+      .attrTween("dy",function(){
+        return d3.interpolateString(".71em",".70999em");
+      })
+      .attrTween("fill",function(){
+        return d3.interpolateString("yellow","blue");
+      })
+      .each("end",function(){
+        if(--ticks===0){
+          emitter.emit("onTransitionFinshed",+new Date());
+        }
+      });
+
+    return axis;
+  }
+
 
   let render = ()=>{
     if(!d3.select('#xAxis').size()){
@@ -56,20 +85,13 @@ function axis(opts){
     config.group.call(drag);
     return axis;
   }
+  window.d3 = d3;
+  window.axis = axis;
+  var p;
+
 
   render();
+
   return axis;
 }
-let shrink = ()=>{
-  return{
-    "dragstart":()=>{},
-    "drag":function shrink(){
-      axis({
-        width: horizontalResize.call(this,{width:config.width})
-      });
-    },
-    "dragend":()=>{}
-  }
-
-
-}
+module.exports = bars;
