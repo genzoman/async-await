@@ -2,7 +2,14 @@ var d3 = require("d3");
 var ee = require("event-emitter");
 var emitter = require("../ChartEvents");
 var checkbox = require("./checkbox");
+//this file just add something to a prototype
+//it doesn't export anything
+require("../xaxis/transitions/width");
+
+
 checkbox();
+//width transition!
+d3.select("path").transition().width(50);
 var button = d3.select("body")
   .append("div")
   .text("CLICK 121ME")

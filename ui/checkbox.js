@@ -6,7 +6,10 @@ let binding = {
 
 
 function checkbox(){
-  return d3.select("body").append("input").attr("type","checkbox")
+  return d3.select("body")
+    .append("input")
+    .attr("type","checkbox")
+    .attr("checked",binding.enable)
     .on("change",function(){
       binding.enable = !binding.enable;
       emitter.emit("onAxisToggle",binding);
