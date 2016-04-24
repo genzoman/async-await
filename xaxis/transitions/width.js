@@ -12,5 +12,3 @@ function width_(width){
     return d3.interpolateString(getPathWidth(1),getPathWidth(width));
   })
 }
-
-window.d3 = d3;
