@@ -9,6 +9,6 @@ let getPathWidth = (h)=>{
 
 function hide_(h){
   this.transition().duration(600).attrTween("d",function(){
-    return d3.interpolateString(getPathWidth(500),getPathWidth(.001));
+    return d3.interpolateString(getPathWidth(h),getPathWidth(.001));
   })
 }

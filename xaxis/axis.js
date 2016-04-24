@@ -22,7 +22,12 @@ var config = {
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
+require("./transitions/hide");
+require("./transitions/width");
+
+//EXPORT
 module.exports = axis;
+
 function axis(opts){
   config = getConfig(config,opts);
 
@@ -52,6 +57,18 @@ function axis(opts){
       getTextElems().attr(prop,config.font[prop]);
     }
     return axis;
+  }
+  axis.toggle = function(){
+    config.enable = !config.enable;
+
+    if(config.enable){
+      d3.select("path").transition().width(500);
+    }
+    else{
+      d3.select("path").transition().hide(500);
+    }
+
+
   }
   //
   axis.width = ()=>config.width;

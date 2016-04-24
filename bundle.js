@@ -16,7 +16,7 @@ emitter.on('onFontChange',function(data){
   axis(data);
 });
 emitter.on('onAxisToggle',function(data){
-  axis(data);
+  axis.toggle();
 });
 
 module.exports = emitter;
@@ -60,9 +60,9 @@ require("../xaxis/transitions/width");
 require("../xaxis/transitions/height");
 require("../xaxis/transitions/hide");
 
-//checkbox();
+checkbox();
 
-d3.select("path").transition().hide(7);
+
 
 var button = d3.select("body")
   .append("div")
@@ -139,7 +139,12 @@ var config = {
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
+require("./transitions/hide");
+require("./transitions/width");
+
+//EXPORT
 module.exports = axis;
+
 function axis(opts){
   config = getConfig(config,opts);
 
@@ -170,6 +175,18 @@ function axis(opts){
     }
     return axis;
   }
+  axis.toggle = function(){
+    config.enable = !config.enable;
+
+    if(config.enable){
+      d3.select("path").transition().width(500);
+    }
+    else{
+      d3.select("path").transition().hide(500);
+    }
+
+
+  }
   //
   axis.width = ()=>config.width;
   //
@@ -199,7 +216,7 @@ let shrink = ()=>{
 
 }
 
-},{"../behaviors/horizontalResize":2,"../utils/translate":5,"d3":11,"underscore":26}],7:[function(require,module,exports){
+},{"../behaviors/horizontalResize":2,"../utils/translate":5,"./transitions/hide":8,"./transitions/width":9,"d3":11,"underscore":26}],7:[function(require,module,exports){
 var d3 = require("d3");
 let getPathHeight = (h)=>{
   return `M0,${h}V0H500V${h}`
@@ -225,8 +242,8 @@ let getPathWidth = (h)=>{
 })();
 
 function hide_(h){
-  this.transition().duration(500).attrTween("d",function(){
-    return d3.interpolateString(getPathWidth(500),getPathWidth(.001));
+  this.transition().duration(600).attrTween("d",function(){
+    return d3.interpolateString(getPathWidth(h),getPathWidth(.001));
   })
 }
 

@@ -7,9 +7,9 @@ require("../xaxis/transitions/width");
 require("../xaxis/transitions/height");
 require("../xaxis/transitions/hide");
 
-//checkbox();
+checkbox();
 
-d3.select("path").transition().hide(7);
+
 
 var button = d3.select("body")
   .append("div")
