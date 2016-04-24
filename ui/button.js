@@ -5,11 +5,11 @@ var checkbox = require("./checkbox");
 
 require("../xaxis/transitions/width");
 require("../xaxis/transitions/height");
+require("../xaxis/transitions/hide");
 
+//checkbox();
 
-checkbox();
-//width transition!
-d3.select("path").transition().height(50);
+d3.select("path").transition().hide(7);
 
 var button = d3.select("body")
   .append("div")

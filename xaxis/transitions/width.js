@@ -8,6 +8,7 @@ let getPathWidth = (width)=>{
 })();
 
 function width_(width){
+  
   this.transition().duration(400).attrTween("d",function(){
     return d3.interpolateString(getPathWidth(1),getPathWidth(width));
   })
