@@ -18,7 +18,9 @@ emitter.on('onFontChange',function(data){
 emitter.on('onAxisToggle',function(data){
   axis.toggle();
 });
-
+emitter.on('onAxisHide',function(data){
+  axis.hide();
+});
 module.exports = emitter;
 
 },{"./xaxis/axis":6,"event-emitter":25}],2:[function(require,module,exports){
@@ -103,7 +105,7 @@ function checkbox(){
     .attr("checked",binding.enable)
     .on("change",function(){
       binding.enable = !binding.enable;
-      emitter.emit("onAxisToggle",binding);
+      emitter.emit("onAxisHide",binding);
     });
 }
 module.exports = checkbox;
@@ -135,7 +137,7 @@ var config = {
   orient: 'bottom',
   enable: true
 }
-
+window.axis = axis;
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
@@ -174,6 +176,9 @@ function axis(opts){
       getTextElems().attr(prop,config.font[prop]);
     }
     return axis;
+  }
+  axis.hide = function(){
+    d3.select("path").transition().hide();
   }
   axis.toggle = function(){
     config.enable = !config.enable;
@@ -233,18 +238,33 @@ function height_(h){
 
 },{"d3":11}],8:[function(require,module,exports){
 var d3 = require("d3");
-let getPathWidth = (h)=>{
-  return `M0,6V0H${h}V6`
+window.d3 = d3;
+let shrinkX = ()=>{
+  var h = d3.select("path").node().getBoundingClientRect().height;
+  var w = d3.select("path").node().getBoundingClientRect().width;
+  var begin = d3.select("path").attr("d");
+  var end =  `M0,${h}V0H${0}V${h}`;
+  return d3.interpolateString(begin,end)
+
 }
+
+let shrinkY = ()=>{
+
+  var w = d3.select("path").node().getBoundingClientRect().width;
+  var h = d3.select("path").node().getBoundingClientRect().height;
+  var end =  `M0,${0}V0H${w}V${0}`;
+  var begin = d3.select("path").attr("d");
+  return d3.interpolateString(begin,end);
+}
+
+
 
 (function(){
   d3.transition.prototype.hide = hide_;
 })();
 
 function hide_(h){
-  this.transition().duration(600).attrTween("d",function(){
-    return d3.interpolateString(getPathWidth(h),getPathWidth(.001));
-  })
+  this.transition().duration(600).attrTween("d",shrinkY)
 }
 
 },{"d3":11}],9:[function(require,module,exports){

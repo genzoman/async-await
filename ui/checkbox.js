@@ -12,7 +12,7 @@ function checkbox(){
     .attr("checked",binding.enable)
     .on("change",function(){
       binding.enable = !binding.enable;
-      emitter.emit("onAxisToggle",binding);
+      emitter.emit("onAxisHide",binding);
     });
 }
 module.exports = checkbox;

@@ -18,7 +18,7 @@ var config = {
   orient: 'bottom',
   enable: true
 }
-
+window.axis = axis;
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
@@ -57,6 +57,9 @@ function axis(opts){
       getTextElems().attr(prop,config.font[prop]);
     }
     return axis;
+  }
+  axis.hide = function(){
+    d3.select("path").transition().hide();
   }
   axis.toggle = function(){
     config.enable = !config.enable;

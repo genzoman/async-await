@@ -17,5 +17,7 @@ emitter.on('onFontChange',function(data){
 emitter.on('onAxisToggle',function(data){
   axis.toggle();
 });
-
+emitter.on('onAxisHide',function(data){
+  axis.hide();
+});
 module.exports = emitter;
