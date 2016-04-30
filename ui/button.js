@@ -23,14 +23,6 @@ var button = d3.select("body")
   });
 });
 /*
-  aqui tenemos
-  la mujer mas lindaen todo del mundo
-
-  se llama azul,
-  i heard from the bar in the hotel where i was drinking
-  creo que me gusta la manera you smile when
-  no sabes que estoy mirando
-
 
 
 */

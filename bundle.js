@@ -268,6 +268,8 @@ function height_(h){
 },{"d3":12}],9:[function(require,module,exports){
 var d3 = require("d3");
 const getPathString = require("../../paths/getPathString");
+var _ = require("underscore");
+let getConfig = (opts)=> _.extend(config_,opts);
 window.d3 = d3;
 (function(){
   d3.transition.prototype.hide = hide_;
@@ -326,18 +328,29 @@ let verticalAxisShrink = ()=>{
   let vertical = (dir)=>{
 
     var start = getPathString('left',config_);
-    var end = getPathString('left',{
-      height: .001,
-      width: 6,
-      orient: 'left',
-      isX:false,
-      range: config_.range
-    });
+    var newConfig = getConfig({
+      height: 0.001,
+      isX:false
+    },config_);
     return dir==="bottomUp" ?  d3.interpolateString(start,end): d3.interpolateString(end,start);
 
   }
+
+  let horizontal = (dir)=>{
+
+    var start = getPathString('left',config_);
+    var newConfig = getConfig({
+      width: 0.001,
+      isX:false
+    },config_);
+    var end = getPathString('left',newConfig);
+    return dir==="leftRight" ?  d3.interpolateString(start,end): d3.interpolateString(end,start);
+
+  }
+
   return {
-    vertical: vertical
+    vertical: vertical,
+    horizontal: horizontal
   }
 }
 
@@ -358,13 +371,13 @@ let hide = ()=>{
     return horizontalAxisShrink().leftToRight(sign);
   }
   else{
-    return verticalAxisShrink().vertical('bottomUp')
+    return verticalAxisShrink().horizontal('leftRight')
   }
 
 
 }
 
-},{"../../paths/getPathString":3,"d3":12}],10:[function(require,module,exports){
+},{"../../paths/getPathString":3,"d3":12,"underscore":27}],10:[function(require,module,exports){
 var d3 = require("d3");
 let getPathWidth = (width)=>{
   return `M0,6V0H${width}V6`
