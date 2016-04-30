@@ -258,7 +258,20 @@ function hide_(config){
   this.transition().duration(600).attrTween("d",hide);
 
 }
-
+let shrinkFromLeftToRight = (sign)=>{
+  start = "M" + config_.range[0] + ","
+    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+  end = "M" + config_.range[1] + ","
+    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+  return d3.interpolateString(start,end);
+}
+let shrinkFromRightToLeft = (sign)=>{
+  start = "M" + config_.range[0] + ","
+    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+  end = "M" + 0 + ","
+    + sign * config_.outerTickSize + "V0H" + config_.range[0] + "V" + sign * config_.outerTickSize;
+  return d3.interpolateString(start,end);
+}
 let hide = ()=>{
   let sign = config_.orient === "top" || config_.orient === "left" ? -1 : 1,
       range = config_.range, //<-range is array
@@ -266,12 +279,10 @@ let hide = ()=>{
       start='',
       end='';
   if(config_.orient ==="bottom" || config_.orient==="top"){
-    start = "M" + range[0] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize;
-    end = "M" + range[1] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize
+    //return shrinkFromLeftToRight();
+    return shrinkFromRightToLeft(sign);
   }
-  else{
-    start ="M" + sign * outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + sign * outerTickSize
-  }
+
   return d3.interpolateString(start,end);
 }
 
