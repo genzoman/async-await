@@ -81,25 +81,48 @@ var rect = d3.select("rect");
 
 
 setTimeout(function(){
-  hide('topDown');
-},4000);
-function hide(dir){
-  if(dir==="bottomUp"){
-    return d3.select("rect").transition().duration(400).attrTween("height",function(){
-      var w = +d3.select(this).attr("height");
-      return d3.interpolateNumber(w--,0);
-    });
+  hide('horizontal','leftRight');
+},2000);
+function hide(orient,dir){
+  if(orient==="vertical"){
+    if(dir==="bottomUp"){
+      return d3.select("rect").transition().duration(400).attrTween("height",function(){
+        var w = +d3.select(this).attr("height");
+        return d3.interpolateNumber(w--,0);
+      });
+    }
+    if(dir==="topDown"){
+      return d3.select("rect").transition().duration(400).attrTween("height",function(){
+        var w = +d3.select(this).attr("height");
+        return d3.interpolateNumber(w--,0);
+      }).attrTween("y",function(){
+        var y = +d3.select(this).attr("y");
+        var w = +d3.select(this).attr("width")
+        return d3.interpolateNumber(y,w/2);
+      });
+    }
   }
-  if(dir==="topDown"){
-    return d3.select("rect").transition().duration(400).attrTween("height",function(){
-      var w = +d3.select(this).attr("height");
-      return d3.interpolateNumber(w--,0);
-    }).attrTween("y",function(){
-      var y = +d3.select(this).attr("y");
-      var w = +d3.select(this).attr("width")
-      return d3.interpolateNumber(y,w/2);
-    });
+  else{
+    //
+    if(dir==="rightLeft"){
+      return d3.select("rect").transition().duration(400).attrTween("width",function(){
+        var w = +d3.select(this).attr("width");
+        return d3.interpolateNumber(w--,0);
+      });
+    }
+    if(dir==="leftRight"){
+      return d3.select("rect").transition().duration(400).attrTween("width",function(){
+        var w = +d3.select(this).attr("width");
+        return d3.interpolateNumber(w--,0);
+      }).attrTween("x",function(){
+        var x = +d3.select(this).attr("x");
+        var w = +d3.select(this).attr("width")
+        return d3.interpolateNumber(x,w/2);
+      });
+    }
   }
+
+
 
 
 }
