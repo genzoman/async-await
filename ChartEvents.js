@@ -5,6 +5,7 @@ var axis = require("./xaxis/axis");
 
 axis({
   width: 500,
+  height: 1000,
   id: '#svg'
 })
 

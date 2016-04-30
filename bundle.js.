@@ -6,6 +6,7 @@ var axis = require("./xaxis/axis");
 
 axis({
   width: 500,
+  height: 1000,
   id: '#svg'
 })
 
@@ -255,9 +256,81 @@ window.d3 = d3;
 var config_;
 function hide_(config){
   config_ = config;
-  this.transition().duration(600).attrTween("d",hide);
+  this.transition().duration(200).attrTween("d",hide);
 
 }
+//begin horizontal axis shrinking
+let horizontalAxisShrink = ()=>{
+  let shrinkFromLeftToRight = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    end = "M" + config_.range[1] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    return d3.interpolateString(start,end);
+  }
+  let shrinkFromRightToLeft = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    end = "M" + 0 + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[0] + "V" + sign * config_.outerTickSize;
+    return d3.interpolateString(start,end);
+  }
+  let shrinkBottomToTop = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    end = "M" + 0 + ","
+      + sign * 0 + "V0H" + config_.range[0] + "V" + sign * 0;
+    return d3.interpolateString(start,end);
+  }
+
+  let shrinkTopToBottom = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * 0 + "V0H" + config_.range[1] + "V" + sign * 10;
+
+    end = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+
+    return d3.interpolateString(start,end);
+  }
+  return {
+    leftToRight: shrinkFromLeftToRight,
+    rightToLeft: shrinkFromRightToLeft,
+    bottomToTop: shrinkBottomToTop,
+    topToBottom: shrinkTopToBottom
+  }
+}
+
+//end horizontal axis shrinking
+
+//begin vertical axis shrinking
+let verticalAxisShrink = ()=>{
+  let topToBottom = (sign)=>{
+    let start = "M" + sign * config_.outerTickSize + ","
+      + 1 + "HOV" + config_.range[1] + "H" + sign * config_.outerTickSize;
+
+      let end = "M" + sign * config_.outerTickSize + ","
+        + 1 + "HOV" + 1 + "H" + sign * config_.outerTickSize;
+
+    return d3.interpolateString('M-6,0H0V500H-6','M-6,0H0V0H-6');;
+  }
+  return {
+    topToBottom: topToBottom
+  }
+}
+
+let getPathString = ()=>{
+  // let sign = config_.orient === "top" || config_.orient === "left" ? -1 : 1;
+  // if(config_.orient === "bottom" || config_.orient ="top"){
+  //
+  // }
+  // else{
+  //   //"M" + sign * outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + sign * outerTickSize)
+  //   var w = sign*config_.outerTickSize;
+  //   return `M${w},${config_.range[0]}H0V${config_.range[1]}H${w}`
+  // }
+}
+
+//end vertical axis shrinking
 
 let hide = ()=>{
   let sign = config_.orient === "top" || config_.orient === "left" ? -1 : 1,
@@ -265,14 +338,17 @@ let hide = ()=>{
       outerTickSize = config_.outerTickSize || 6,
       start='',
       end='';
+  console.log(getPathString(config_));
   if(config_.orient ==="bottom" || config_.orient==="top"){
-    start = "M" + range[0] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize;
-    end = "M" + range[1] + "," + sign * outerTickSize + "V0H" + range[0] + "V" + sign * outerTickSize
+    //return shrinkFromLeftToRight();
+    //return shrinkBottomToTop(sign);
+    return horizontalAxisShrink().leftToRight(sign);
   }
   else{
-    start ="M" + sign * outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + sign * outerTickSize
+    return verticalAxisShrink().topToBottom(sign)
   }
-  return d3.interpolateString(start,end);
+
+
 }
 
 },{"d3":11}],9:[function(require,module,exports){

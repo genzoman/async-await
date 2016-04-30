@@ -6,6 +6,7 @@ var axis = require("./xaxis/axis");
 
 axis({
   width: 500,
+  height: 1000,
   id: '#svg'
 })
 
@@ -25,7 +26,7 @@ emitter.on('onAxisHide',function(data){
 });
 module.exports = emitter;
 
-},{"./xaxis/axis":6,"event-emitter":25}],2:[function(require,module,exports){
+},{"./xaxis/axis":7,"event-emitter":26}],2:[function(require,module,exports){
 var d3 = require('d3');
 var translate = require("../utils/translate");
 module.exports = horizontalResize;
@@ -54,7 +55,25 @@ function horizontalResize(config){
   return getWidth();
 }
 
-},{"../utils/translate":5,"d3":11}],3:[function(require,module,exports){
+},{"../utils/translate":6,"d3":12}],3:[function(require,module,exports){
+var d3 = require("d3");
+function getPathString(orient,config){
+    var h,w;
+    var sign = orient === "top" || orient === "left" ? -1 : 1;
+    if(orient === "top" || orient === "left" && config.isX){
+        h = sign * config.height || sign * config.outerTickSize,
+        w = config.width || config.range[1];
+    }
+    else{
+      w = sign * config.width || sign * config.outerTickSize,
+      h = config.height || config.range[1];
+    }
+    return `M${0},${h}V0H${w}V${h}`
+}
+
+module.exports = getPathString;
+
+},{"d3":12}],4:[function(require,module,exports){
 var d3 = require("d3");
 var ee = require("event-emitter");
 var emitter = require("../ChartEvents");
@@ -92,7 +111,7 @@ var button = d3.select("body")
 
 */
 
-},{"../ChartEvents":1,"../xaxis/transitions/height":7,"../xaxis/transitions/hide":8,"../xaxis/transitions/width":9,"./checkbox":4,"d3":11,"event-emitter":25}],4:[function(require,module,exports){
+},{"../ChartEvents":1,"../xaxis/transitions/height":8,"../xaxis/transitions/hide":9,"../xaxis/transitions/width":10,"./checkbox":5,"d3":12,"event-emitter":26}],5:[function(require,module,exports){
 const d3 = require("d3");
 var emitter = require("../ChartEvents");
 let binding = {
@@ -112,13 +131,13 @@ function checkbox(){
 }
 module.exports = checkbox;
 
-},{"../ChartEvents":1,"d3":11}],5:[function(require,module,exports){
+},{"../ChartEvents":1,"d3":12}],6:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
@@ -231,7 +250,7 @@ let shrink = ()=>{
 
 }
 
-},{"../behaviors/horizontalResize":2,"../utils/translate":5,"./transitions/hide":8,"./transitions/width":9,"d3":11,"underscore":26}],7:[function(require,module,exports){
+},{"../behaviors/horizontalResize":2,"../utils/translate":6,"./transitions/hide":9,"./transitions/width":10,"d3":12,"underscore":27}],8:[function(require,module,exports){
 var d3 = require("d3");
 let getPathHeight = (h)=>{
   return `M0,${h}V0H500V${h}`
@@ -246,8 +265,9 @@ function height_(h){
   })
 }
 
-},{"d3":11}],8:[function(require,module,exports){
+},{"d3":12}],9:[function(require,module,exports){
 var d3 = require("d3");
+const getPathString = require("../../paths/getPathString");
 window.d3 = d3;
 (function(){
   d3.transition.prototype.hide = hide_;
@@ -255,42 +275,75 @@ window.d3 = d3;
 var config_;
 function hide_(config){
   config_ = config;
-  this.transition().duration(600).attrTween("d",hide);
+  this.transition().duration(400).attrTween("d",hide);
 
 }
-let shrinkFromLeftToRight = (sign)=>{
-  start = "M" + config_.range[0] + ","
-    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-  end = "M" + config_.range[1] + ","
-    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-  return d3.interpolateString(start,end);
+//begin horizontal axis shrinking
+let horizontalAxisShrink = ()=>{
+  let shrinkFromLeftToRight = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    end = "M" + config_.range[1] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    return d3.interpolateString(start,end);
+  }
+  let shrinkFromRightToLeft = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    end = "M" + 0 + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[0] + "V" + sign * config_.outerTickSize;
+    return d3.interpolateString(start,end);
+  }
+  let shrinkBottomToTop = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+    end = "M" + 0 + ","
+      + sign * 0 + "V0H" + config_.range[0] + "V" + sign * 0;
+    return d3.interpolateString(start,end);
+  }
+
+  let shrinkTopToBottom = (sign)=>{
+    start = "M" + config_.range[0] + ","
+      + sign * 0 + "V0H" + config_.range[1] + "V" + sign * 10;
+
+    end = "M" + config_.range[0] + ","
+      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+
+    return d3.interpolateString(start,end);
+  }
+  return {
+    leftToRight: shrinkFromLeftToRight,
+    rightToLeft: shrinkFromRightToLeft,
+    bottomToTop: shrinkBottomToTop,
+    topToBottom: shrinkTopToBottom
+  }
 }
-let shrinkFromRightToLeft = (sign)=>{
-  start = "M" + config_.range[0] + ","
-    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-  end = "M" + 0 + ","
-    + sign * config_.outerTickSize + "V0H" + config_.range[0] + "V" + sign * config_.outerTickSize;
-  return d3.interpolateString(start,end);
-}
-let shrinkBottomToTop = (sign)=>{
-  start = "M" + config_.range[0] + ","
-    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-  end = "M" + 0 + ","
-    + sign * 0 + "V0H" + config_.range[0] + "V" + sign * 0;
-  return d3.interpolateString(start,end);
-}
 
-let shrinkTopToBottom = (sign)=>{
-  start = "M" + config_.range[0] + ","
-    + sign * 0 + "V0H" + config_.range[1] + "V" + sign * 0;
+//end horizontal axis shrinking
 
-  end = "M" + config_.range[0] + ","
-    + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
+//begin vertical axis shrinking
+let verticalAxisShrink = ()=>{
+  let vertical = (dir)=>{
 
-  return d3.interpolateString(start,end);
+    var start = getPathString('left',config_);
+    var end = getPathString('left',{
+      height: .001,
+      width: 6,
+      orient: 'left',
+      isX:false,
+      range: config_.range
+    });
+    return dir==="bottomUp" ?  d3.interpolateString(start,end): d3.interpolateString(end,start);
+
+  }
+  return {
+    vertical: vertical
+  }
 }
 
 
+
+//end vertical axis shrinking
 
 let hide = ()=>{
   let sign = config_.orient === "top" || config_.orient === "left" ? -1 : 1,
@@ -298,16 +351,20 @@ let hide = ()=>{
       outerTickSize = config_.outerTickSize || 6,
       start='',
       end='';
+
   if(config_.orient ==="bottom" || config_.orient==="top"){
     //return shrinkFromLeftToRight();
     //return shrinkBottomToTop(sign);
-    return shrinkTopToBottom(sign);
+    return horizontalAxisShrink().leftToRight(sign);
+  }
+  else{
+    return verticalAxisShrink().vertical('bottomUp')
   }
 
-  return d3.interpolateString(start,end);
+
 }
 
-},{"d3":11}],9:[function(require,module,exports){
+},{"../../paths/getPathString":3,"d3":12}],10:[function(require,module,exports){
 var d3 = require("d3");
 let getPathWidth = (width)=>{
   return `M0,6V0H${width}V6`
@@ -324,7 +381,7 @@ function width_(width){
   })
 }
 
-},{"d3":11}],10:[function(require,module,exports){
+},{"d3":12}],11:[function(require,module,exports){
 'use strict';
 
 var assign        = require('es5-ext/object/assign')
@@ -389,7 +446,7 @@ d.gs = function (dscr, get, set/*, options*/) {
 	return !options ? desc : assign(normalizeOpts(options), desc);
 };
 
-},{"es5-ext/object/assign":12,"es5-ext/object/is-callable":15,"es5-ext/object/normalize-options":19,"es5-ext/string/#/contains":22}],11:[function(require,module,exports){
+},{"es5-ext/object/assign":13,"es5-ext/object/is-callable":16,"es5-ext/object/normalize-options":20,"es5-ext/string/#/contains":23}],12:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -9944,14 +10001,14 @@ d.gs = function (dscr, get, set/*, options*/) {
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? Object.assign
 	: require('./shim');
 
-},{"./is-implemented":13,"./shim":14}],13:[function(require,module,exports){
+},{"./is-implemented":14,"./shim":15}],14:[function(require,module,exports){
 'use strict';
 
 module.exports = function () {
@@ -9962,7 +10019,7 @@ module.exports = function () {
 	return (obj.foo + obj.bar + obj.trzy) === 'razdwatrzy';
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 var keys  = require('../keys')
@@ -9986,21 +10043,21 @@ module.exports = function (dest, src/*, …srcn*/) {
 	return dest;
 };
 
-},{"../keys":16,"../valid-value":21}],15:[function(require,module,exports){
+},{"../keys":17,"../valid-value":22}],16:[function(require,module,exports){
 // Deprecated
 
 'use strict';
 
 module.exports = function (obj) { return typeof obj === 'function'; };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? Object.keys
 	: require('./shim');
 
-},{"./is-implemented":17,"./shim":18}],17:[function(require,module,exports){
+},{"./is-implemented":18,"./shim":19}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = function () {
@@ -10010,7 +10067,7 @@ module.exports = function () {
 	} catch (e) { return false; }
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var keys = Object.keys;
@@ -10019,7 +10076,7 @@ module.exports = function (object) {
 	return keys(object == null ? object : Object(object));
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 var forEach = Array.prototype.forEach, create = Object.create;
@@ -10038,7 +10095,7 @@ module.exports = function (options/*, …options*/) {
 	return result;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 module.exports = function (fn) {
@@ -10046,7 +10103,7 @@ module.exports = function (fn) {
 	return fn;
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 module.exports = function (value) {
@@ -10054,14 +10111,14 @@ module.exports = function (value) {
 	return value;
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? String.prototype.contains
 	: require('./shim');
 
-},{"./is-implemented":23,"./shim":24}],23:[function(require,module,exports){
+},{"./is-implemented":24,"./shim":25}],24:[function(require,module,exports){
 'use strict';
 
 var str = 'razdwatrzy';
@@ -10071,7 +10128,7 @@ module.exports = function () {
 	return ((str.contains('dwa') === true) && (str.contains('foo') === false));
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 var indexOf = String.prototype.indexOf;
@@ -10080,7 +10137,7 @@ module.exports = function (searchString/*, position*/) {
 	return indexOf.call(this, searchString, arguments[1]) > -1;
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 var d        = require('d')
@@ -10214,7 +10271,7 @@ module.exports = exports = function (o) {
 };
 exports.methods = methods;
 
-},{"d":10,"es5-ext/object/valid-callable":20}],26:[function(require,module,exports){
+},{"d":11,"es5-ext/object/valid-callable":21}],27:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -11764,4 +11821,4 @@ exports.methods = methods;
   }
 }.call(this));
 
-},{}]},{},[3]);
+},{}]},{},[4]);
