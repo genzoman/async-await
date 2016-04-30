@@ -58,9 +58,17 @@ function axis(opts){
     }
     return axis;
   }
+
   axis.hide = function(){
-    d3.select("path").transition().hide();
+    d3.select("path").transition().hide({
+      range: [0, config.width],
+      outerTickSize: 6,
+      orient: config.orient
+    });
   }
+
+  axis.config = ()=> config;
+
   axis.toggle = function(){
     config.enable = !config.enable;
 

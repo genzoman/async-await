@@ -1,29 +1,27 @@
 var d3 = require("d3");
 window.d3 = d3;
-let shrinkX = ()=>{
-  var h = d3.select("path").node().getBoundingClientRect().height;
-  var w = d3.select("path").node().getBoundingClientRect().width;
-  var begin = d3.select("path").attr("d");
-  var end =  `M0,${h}V0H${0}V${h}`;
-  return d3.interpolateString(begin,end)
-
-}
-
-let shrinkY = ()=>{
-
-  var w = d3.select("path").node().getBoundingClientRect().width;
-  var h = d3.select("path").node().getBoundingClientRect().height;
-  var end =  `M0,${0}V0H${w}V${0}`;
-  var begin = d3.select("path").attr("d");
-  return d3.interpolateString(begin,end);
-}
-
-
-
 (function(){
   d3.transition.prototype.hide = hide_;
-})();
+})()
+var config_;
+function hide_(config){
+  config_ = config;
+  this.transition().duration(600).attrTween("d",hide);
 
-function hide_(h){
-  this.transition().duration(600).attrTween("d",shrinkY)
+}
+
+let hide = ()=>{
+  let sign = config_.orient === "top" || config_.orient === "left" ? -1 : 1,
+      range = config_.range, //<-range is array
+      outerTickSize = config_.outerTickSize || 6,
+      start='',
+      end='';
+  if(config_.orient ==="bottom" || config_.orient==="top"){
+    start = "M" + range[0] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize;
+    end = "M" + range[1] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize
+  }
+  else{
+    start ="M" + sign * outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + sign * outerTickSize
+  }
+  return d3.interpolateString(start,end);
 }

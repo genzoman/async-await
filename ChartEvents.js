@@ -7,6 +7,8 @@ axis({
   width: 500,
   id: '#svg'
 })
+
+
 emitter.on('onButtonClick',(time)=>{
   console.log("the time when you click the button",time);
 });

@@ -267,7 +267,7 @@ let hide = ()=>{
       end='';
   if(config_.orient ==="bottom" || config_.orient==="top"){
     start = "M" + range[0] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize;
-    end = "M" + range[1] + "," + sign * outerTickSize + "V0H" + range[1] + "V" + sign * outerTickSize
+    end = "M" + range[1] + "," + sign * outerTickSize + "V0H" + range[0] + "V" + sign * outerTickSize
   }
   else{
     start ="M" + sign * outerTickSize + "," + range[0] + "H0V" + range[1] + "H" + sign * outerTickSize

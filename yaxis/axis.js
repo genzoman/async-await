@@ -70,15 +70,4 @@ function axis(newOpts){
 
   return axis;
 }
-axis({
-  id: '#svg',
-  height: 500
-}).drag({
-  "dragstart":()=>{},
-  "drag":function(){
-    axis({
-      height: verticalResize.call(this,{height:config.height})
-    });
-  },
-  "dragend":()=>{}
-})
+module.exports = axis;
