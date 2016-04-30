@@ -81,12 +81,28 @@ var rect = d3.select("rect");
 
 
 setTimeout(function(){
-  d3.select("rect").transition().duration(400).attrTween("width",function(){
-    var w = +d3.select(this).attr("width");
-    return d3.interpolateNumber(w--,0);
-  });
+  hide('topDown');
+},4000);
+function hide(dir){
+  if(dir==="bottomUp"){
+    return d3.select("rect").transition().duration(400).attrTween("height",function(){
+      var w = +d3.select(this).attr("height");
+      return d3.interpolateNumber(w--,0);
+    });
+  }
+  if(dir==="topDown"){
+    return d3.select("rect").transition().duration(400).attrTween("height",function(){
+      var w = +d3.select(this).attr("height");
+      return d3.interpolateNumber(w--,0);
+    }).attrTween("y",function(){
+      var y = +d3.select(this).attr("y");
+      var w = +d3.select(this).attr("width")
+      return d3.interpolateNumber(y,w/2);
+    });
+  }
 
-},2000);
+
+}
 
 },{"d3":11,"underscore":26}],5:[function(require,module,exports){
 var d3 = require("d3");
