@@ -3,8 +3,7 @@ var ee = require("event-emitter");
 var emitter = require("../ChartEvents");
 var checkbox = require("./checkbox");
 
-require("../xaxis/transitions/width");
-require("../xaxis/transitions/height");
+
 require("../xaxis/transitions/hide");
 
 checkbox();

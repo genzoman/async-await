@@ -23,7 +23,7 @@ let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
 require("./transitions/hide");
-require("./transitions/width");
+
 
 //EXPORT
 module.exports = axis;
