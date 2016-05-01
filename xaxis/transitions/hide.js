@@ -13,45 +13,6 @@ function hide_(config){
 
 }
 //begin horizontal axis shrinking
-let horizontalAxisShrink = ()=>{
-  let shrinkFromLeftToRight = (sign)=>{
-    start = "M" + config_.range[0] + ","
-      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-    end = "M" + config_.range[1] + ","
-      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-    return d3.interpolateString(start,end);
-  }
-  let shrinkFromRightToLeft = (sign)=>{
-    start = "M" + config_.range[0] + ","
-      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-    end = "M" + 0 + ","
-      + sign * config_.outerTickSize + "V0H" + config_.range[0] + "V" + sign * config_.outerTickSize;
-    return d3.interpolateString(start,end);
-  }
-  let shrinkBottomToTop = (sign)=>{
-    start = "M" + config_.range[0] + ","
-      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-    end = "M" + 0 + ","
-      + sign * 0 + "V0H" + config_.range[0] + "V" + sign * 0;
-    return d3.interpolateString(start,end);
-  }
-
-  let shrinkTopToBottom = (sign)=>{
-    start = "M" + config_.range[0] + ","
-      + sign * 0 + "V0H" + config_.range[1] + "V" + sign * 10;
-
-    end = "M" + config_.range[0] + ","
-      + sign * config_.outerTickSize + "V0H" + config_.range[1] + "V" + sign * config_.outerTickSize;
-
-    return d3.interpolateString(start,end);
-  }
-  return {
-    leftToRight: shrinkFromLeftToRight,
-    rightToLeft: shrinkFromRightToLeft,
-    bottomToTop: shrinkBottomToTop,
-    topToBottom: shrinkTopToBottom
-  }
-}
 
 //end horizontal axis shrinking
 

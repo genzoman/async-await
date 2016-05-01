@@ -46,7 +46,7 @@ function axis(opts){
       config.group = d3.select(config.id)
           .append("g")
           .attr("id","xAxis")
-          .attr("transform",translate(100,100))
+          .attr("transform",translate(100,20))
 
       if(!config.enable){
         config.group.style("display","none");

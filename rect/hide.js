@@ -2,7 +2,11 @@ var d3 = require("d3");
 var _ = require("underscore");
 let getConfig = (opts)=> _.extend(config_,opts);
 var rect = d3.select("rect");
-
+rect.insert("rect").attr({
+  x:100,
+  y:100,
+  fill: "blue"
+});
 
 setTimeout(function(){
   hide('horizontal','leftRight');
