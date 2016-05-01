@@ -38,12 +38,38 @@ function circle(opts){
     });
     //return circle;
 
+
+  }
+  circle.fadeColor = (color)=>{
+    var start = circle_.attr("fill") || "black";
+
+    var t = 0;
+    return new Promise((resolve)=>{
+      circle_.transition().duration(1000)
+      .each("start",()=>t++)
+      .attrTween("fill",function(){
+        return d3.interpolateHsl(start,color);
+      })
+      .each("end",function(){
+        t--;
+        if(t===0){
+          resolve(circle);
+        }
+      })
+    })
+  }
+  circle.fadeColor('blue').then(x=>{
+    x.color("green").animate('r',100);
+  })
+  circle.color = (color)=>{
+    circle_.attr("fill",color);
+    return circle;
   }
   circle.animate = (prop,val)=>{
     var start = 0;
     return new Promise((resolve)=>{
       circle_.transition()
-        .duration(2000)
+        .duration(4000)
         .each('start',function(){
           start++;
         })
