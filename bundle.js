@@ -3,72 +3,37 @@ const d3 = require("d3");
 const _ = require("underscore");
 const Promise = require("bluebird");
 var config = {
-  cx: 20,
-  cy: 20,
-  r: 20
+  x: 20,
+  y: 20,
+  width: 20,
+  height: 20
 }
-var circle_ = d3.select("svg").append("circle").attr(config);
-
+var rect_ = d3.select("svg").append("rect").attr(config);
+window.rect = rect;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 
-window.circle =circle;
-function circle(opts){
+function rect(opts){
   config = getConfig(config,opts);
-  circle.radius = (r)=>{
-    circle_.attr("r",r);
-    return circle;
+  rect.x = (x)=>{
+    rect_.attr("x",x);
+    return rect;
   }
-  circle.x = (x)=>{
-    circle_.attr("cx",x);
-    return circle;
-  }
-  circle.cx = circle.x;
-  circle.y = (y)=>{
-    circle_.attr("cy",y);
-    return circle;
-  }
-  circle.cy = circle.y;
-  circle.move = function(x,y){
-    var translate = circle_.attr("transform") || [0,0];
-    circle_.attr("transform",function(){
-      var xVal = translate[0] + x;
-      var yVal = translate[1] + y;
-      return `translate(${xVal},${yVal})`;
 
-    });
-    //return circle;
-
-
+  rect.y = (y)=>{
+    rect_.attr("y",y);
+    return rect;
   }
-  circle.fadeColor = (color)=>{
-    var start = circle_.attr("fill") || "black";
-
-    var t = 0;
-    return new Promise((resolve)=>{
-      circle_.transition().duration(1000)
-      .each("start",()=>t++)
-      .attrTween("fill",function(){
-        return d3.interpolateHsl(start,color);
-      })
-      .each("end",function(){
-        t--;
-        if(t===0){
-          resolve(circle);
-        }
-      })
-    })
+  rect.translate = function(x,y){
+    var translate = rect_.attr("transform") || [0,0];
+    translate = d3.transform(translate).translate;
+    var translateString = `translate(${translate[0] + x},${translate[1] + y})`;
+    rect_.attr("transform",translateString);
+    return rect;
   }
-  circle.fadeColor('blue').then(x=>{
-    x.color("green").animate('r',100);
-  })
-  circle.color = (color)=>{
-    circle_.attr("fill",color);
-    return circle;
-  }
-  circle.animate = (prop,val)=>{
+  rect.animate = (prop,val)=>{
     var start = 0;
     return new Promise((resolve)=>{
-      circle_.transition()
+      rect_.transition()
         .duration(4000)
         .each('start',function(){
           start++;
@@ -80,16 +45,15 @@ function circle(opts){
         .each("end",function(){
           start--;
           if(start===0){
-            resolve(circle);
+            resolve(rect);
           }
         })
-      return circle;
+      return rect;
     });
-
   }
-  return circle;
+  return rect;
 }
-circle();
+rect();
 
 },{"bluebird":2,"d3":3,"underscore":4}],2:[function(require,module,exports){
 (function (process,global){
