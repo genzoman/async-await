@@ -1,59 +1,106 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
 const d3 = require("d3");
 const _ = require("underscore");
 const Promise = require("bluebird");
-var config = {
-  x: 20,
-  y: 20,
-  width: 20,
-  height: 20
+
+let getArc = ()=> {
+    return d3.svg.arc().outerRadius(config.outerRadius).innerRadius(config.innerRadius);
 }
-var rect_ = d3.select("svg").append("rect").attr(config);
-window.rect = rect;
+var data = [1,2,3];
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-
-function rect(opts){
-  config = getConfig(config,opts);
-  rect.x = (x)=>{
-    rect_.attr("x",x);
-    return rect;
-  }
-
-  rect.y = (y)=>{
-    rect_.attr("y",y);
-    return rect;
-  }
-  rect.translate = function(x,y){
-    var translate = rect_.attr("transform") || [0,0];
-    translate = d3.transform(translate).translate;
-    var translateString = `translate(${translate[0] + x},${translate[1] + y})`;
-    rect_.attr("transform",translateString);
-    return rect;
-  }
-  rect.animate = (prop,val)=>{
-    var start = 0;
-    return new Promise((resolve)=>{
-      rect_.transition()
-        .duration(4000)
-        .each('start',function(){
-          start++;
-        })
-        .attrTween(prop,function(){
-          var start = d3.select(this).attr(prop);
-          return d3.interpolateNumber(start,val);
-        })
-        .each("end",function(){
-          start--;
-          if(start===0){
-            resolve(rect);
-          }
-        })
-      return rect;
-    });
-  }
-  return rect;
+var config = {
+  innerRadius: 0,
+  outerRadius: 100,
+  group: '',
+  colors: [],
+  data: data,
+  padAngle: 0
 }
-rect();
+let getColorScale = (d)=>{
+  return d3.scale.ordinal().range([config.colors])(d);
+}
+function arc(opts){
+  config = getConfig(config,opts);
+  let getPie = (data)=> {
+    return d3.layout.pie().sort(null).value(d=>d).padAngle(config.padAngle)(data);
+  }
+  arc.colors = (colors)=>{
+    config = getConfig(config,{colors: colors});
+    arc.render();
+    return arc;
+  }
+  arc.data = (data)=>{
+    config = getConfig(config,{data:data});
+    arc.render();
+    return arc;
+  }
+  arc.outerRadius = (or)=>{
+    config = getConfig(config,{outerRadius: or});
+    arc.render();
+    return arc;
+  }
+  arc.innerRadius = (ir)=>{
+    config = getConfig(config,{innerRadius:ir});
+    arc.render();
+    return arc;
+  }
+  arc.padAngle = (angle)=>{
+    config = getConfig(config,{padAngle:angle});
+
+    arc.render(true);
+    return arc;
+  }
+  arc.translate = (x,y)=>{
+    var str = `translate(${x},${y})`
+    config.group.attr("transform",str);
+    return arc;
+  }
+  arc.render = (remove)=>{
+    if(remove){
+      d3.selectAll("g").remove();
+      config.group = d3.select("svg").append("g")
+        .attr("transform","translate(100,100)")
+        .selectAll(".arc")
+        .data(getPie(config.data))
+          .enter()
+          .append("g");
+      config.group.append("path").attr("d",getArc());
+      return arc;
+    }
+    else{
+      if(!config.group){
+        config.group = d3.select("svg").append("g").attr("transform","translate(100,100)").selectAll(".arc").data(getPie(config.data))
+          .enter().append("g");
+
+        config.group.append("path").attr("d",getArc());
+        return arc;
+      }
+      else{
+        config.group.selectAll("path")
+        .attr("d",getArc());
+      }
+    }
+
+    return arc;
+
+  }
+  arc.render();
+  return arc;
+}
+//end arc
+
+
+arc();
+d3.selectAll("path").transition().duration(1000).attrTween("x",function(){
+  var newAngle = config.padAngle += .001;
+  arc.padAngle(newAngle)
+
+});
+
+
+
+window.arc = arc;
 
 },{"bluebird":2,"d3":3,"underscore":4}],2:[function(require,module,exports){
 (function (process,global){

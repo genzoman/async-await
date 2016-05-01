@@ -29,6 +29,15 @@ function rect(opts){
     rect_.attr("transform",translateString);
     return rect;
   }
+  rect.rotate = function(){
+    rect_.transition().duration(3000).attrTween("transform",function(){
+      var translate = d3.select(this).attr("transform") || "translate(0,0)";
+      var startRotate = translate + " rotate(45 60 0)";
+      var endRotate = translate + " rotate(45 60 60)";
+
+      return d3.interpolateString(startRotate,endRotate);
+    });
+  }
   rect.animate = (prop,val)=>{
     var start = 0;
     return new Promise((resolve)=>{

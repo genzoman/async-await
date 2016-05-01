@@ -35,9 +35,7 @@ function circle(opts){
       return `translate(${xVal},${yVal})`;
 
     });
-    //return circle;
-
-
+    return circle;
   }
   circle.fadeColor = (color)=>{
     var start = circle_.attr("fill") || "black";
