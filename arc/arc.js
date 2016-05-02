@@ -2,7 +2,8 @@
 const d3 = require("d3");
 const _ = require("underscore");
 const Promise = require("bluebird");
-
+const domAttrs = require("../dom/attrs");
+window.domAttrs = domAttrs;
 let getArc = ()=> {
     return d3.svg.arc().outerRadius(config.outerRadius).innerRadius(config.innerRadius);
 }
@@ -12,13 +13,12 @@ var config = {
   innerRadius: 0,
   outerRadius: 100,
   group: '',
-  colors: [],
+  colors: ["#98bbc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"],
   data: data,
   padAngle: 0
 }
-let getColorScale = (d)=>{
-  return d3.scale.ordinal().range([config.colors])(d);
-}
+var color = d3.scale.ordinal().range([config.colors]);
+
 function arc(opts){
   config = getConfig(config,opts);
   let getPie = (data)=> {
@@ -31,7 +31,7 @@ function arc(opts){
   }
   arc.data = (data)=>{
     config = getConfig(config,{data:data});
-    arc.render();
+    arc.render(true);
     return arc;
   }
   arc.outerRadius = (or)=>{
@@ -50,6 +50,7 @@ function arc(opts){
     arc.render(true);
     return arc;
   }
+
   arc.translate = (x,y)=>{
     var str = `translate(${x},${y})`
     config.group.attr("transform",str);
@@ -64,20 +65,37 @@ function arc(opts){
         .data(getPie(config.data))
           .enter()
           .append("g");
-      config.group.append("path").attr("d",getArc());
+      config.group
+      .append("path")
+        .attr("id",function(d,i){
+          return `path_${i}`;
+        })
+        .attr("d",getArc());
       return arc;
     }
     else{
       if(!config.group){
-        config.group = d3.select("svg").append("g").attr("transform","translate(100,100)").selectAll(".arc").data(getPie(config.data))
+        config.group = d3.select("svg").append("g")
+          .attr("transform","translate(100,100)")
+          .selectAll(".arc").data(getPie(config.data))
           .enter().append("g");
 
-        config.group.append("path").attr("d",getArc());
+        config.group.append("path")
+          .attr("id",function(d,i){
+            return `path_${i}`;
+          })
+          .attr("d",getArc())
+          .style("fill",function(d,i){
+            return color(i)[i];
+          });
         return arc;
       }
       else{
         config.group.selectAll("path")
-        .attr("d",getArc());
+        .attr("d",getArc())
+        .style("fill",function(d,i){
+          return color(i)[i];
+        });
       }
     }
 

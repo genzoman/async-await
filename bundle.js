@@ -3,7 +3,8 @@
 const d3 = require("d3");
 const _ = require("underscore");
 const Promise = require("bluebird");
-
+const domAttrs = require("../dom/attrs");
+window.domAttrs = domAttrs;
 let getArc = ()=> {
     return d3.svg.arc().outerRadius(config.outerRadius).innerRadius(config.innerRadius);
 }
@@ -13,13 +14,12 @@ var config = {
   innerRadius: 0,
   outerRadius: 100,
   group: '',
-  colors: [],
+  colors: ["#98bbc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"],
   data: data,
   padAngle: 0
 }
-let getColorScale = (d)=>{
-  return d3.scale.ordinal().range([config.colors])(d);
-}
+var color = d3.scale.ordinal().range([config.colors]);
+
 function arc(opts){
   config = getConfig(config,opts);
   let getPie = (data)=> {
@@ -32,7 +32,7 @@ function arc(opts){
   }
   arc.data = (data)=>{
     config = getConfig(config,{data:data});
-    arc.render();
+    arc.render(true);
     return arc;
   }
   arc.outerRadius = (or)=>{
@@ -51,6 +51,7 @@ function arc(opts){
     arc.render(true);
     return arc;
   }
+
   arc.translate = (x,y)=>{
     var str = `translate(${x},${y})`
     config.group.attr("transform",str);
@@ -65,20 +66,37 @@ function arc(opts){
         .data(getPie(config.data))
           .enter()
           .append("g");
-      config.group.append("path").attr("d",getArc());
+      config.group
+      .append("path")
+        .attr("id",function(d,i){
+          return `path_${i}`;
+        })
+        .attr("d",getArc());
       return arc;
     }
     else{
       if(!config.group){
-        config.group = d3.select("svg").append("g").attr("transform","translate(100,100)").selectAll(".arc").data(getPie(config.data))
+        config.group = d3.select("svg").append("g")
+          .attr("transform","translate(100,100)")
+          .selectAll(".arc").data(getPie(config.data))
           .enter().append("g");
 
-        config.group.append("path").attr("d",getArc());
+        config.group.append("path")
+          .attr("id",function(d,i){
+            return `path_${i}`;
+          })
+          .attr("d",getArc())
+          .style("fill",function(d,i){
+            return color(i)[i];
+          });
         return arc;
       }
       else{
         config.group.selectAll("path")
-        .attr("d",getArc());
+        .attr("d",getArc())
+        .style("fill",function(d,i){
+          return color(i)[i];
+        });
       }
     }
 
@@ -92,17 +110,54 @@ function arc(opts){
 
 
 arc();
-d3.selectAll("path").transition().duration(1000).attrTween("x",function(){
-  var newAngle = config.padAngle += .001;
-  arc.padAngle(newAngle)
 
-});
 
 
 
 window.arc = arc;
 
-},{"bluebird":2,"d3":3,"underscore":4}],2:[function(require,module,exports){
+},{"../dom/attrs":2,"bluebird":3,"d3":4,"underscore":5}],2:[function(require,module,exports){
+var d3 = require ("d3");
+
+let getRectAttrs = (elem)=>{
+
+  return {
+    x: +d3.select(elem).attr("x"),
+    y: +d3.select(elem).attr("y"),
+    width: +d3.select(elem).attr("width"),
+    height: +d3.select(elem).attr("height")
+  }
+}
+let getCircleAttrs  = (elem)=>{
+  return {
+    x: +d3.select(elem).attr("cx"),
+    y: +d3.select(elem).attr("cy"),
+    cx: +d3.select(elem).attr("cx"),
+    cy: +d3.select(elem).attr("cy"),
+    width: +d3.select(elem).attr("width"),
+    height: +d3.select(elem).attr("height")
+  }
+}
+let getGroupAttrs = (elem)=>{
+  var box = elem.getBoundingClientRect();
+  return {
+    width: box.width,
+    height: box.height
+
+  }
+}
+let getAttrs = (elem)=>{
+  switch(elem.tagName.toLowerCase()){
+    case 'rect':
+      return getRectAttrs(elem);
+      break;
+    case 'circle':
+      return getCircleAttrs(elem);
+  }
+}
+module.exports = getAttrs;
+
+},{"d3":4}],3:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -5560,7 +5615,7 @@ module.exports = ret;
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":5}],3:[function(require,module,exports){
+},{"_process":6}],4:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -15115,7 +15170,7 @@ module.exports = ret;
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -16665,7 +16720,7 @@ module.exports = ret;
   }
 }.call(this));
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
