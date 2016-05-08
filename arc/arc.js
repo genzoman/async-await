@@ -5,7 +5,9 @@ const Promise = require("bluebird");
 const domAttrs = require("../dom/attrs");
 window.domAttrs = domAttrs;
 let getArc = ()=> {
-    return d3.svg.arc().outerRadius(config.outerRadius).innerRadius(config.innerRadius);
+    return d3.svg.arc()
+      .outerRadius(config.outerRadius)
+      .innerRadius(config.innerRadius);
 }
 var data = [1,2,3];
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
@@ -70,7 +72,10 @@ function arc(opts){
         .attr("id",function(d,i){
           return `path_${i}`;
         })
-        .attr("d",getArc());
+        .attr("d",getArc())
+        .style("fill",function(d,i){
+          return color(d)[i];
+        })
       return arc;
     }
     else{
@@ -86,7 +91,8 @@ function arc(opts){
           })
           .attr("d",getArc())
           .style("fill",function(d,i){
-            return color(i)[i];
+
+            return color(d)[i];
           });
         return arc;
       }
@@ -94,7 +100,8 @@ function arc(opts){
         config.group.selectAll("path")
         .attr("d",getArc())
         .style("fill",function(d,i){
-          return color(i)[i];
+          var colors = color(d);
+          return colors[i%colors.length-1 ];
         });
       }
     }
@@ -107,10 +114,5 @@ function arc(opts){
 }
 //end arc
 
-
-arc();
-
-
-
-
 window.arc = arc;
+arc();
