@@ -86,4 +86,4 @@ function circle(opts){
   }
   return circle;
 }
-circle();
+module.exports = circle;
