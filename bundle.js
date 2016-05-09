@@ -78,7 +78,7 @@ let getGroupAttrs = (elem)=>{
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
-      return[box.x+ this.translateX,box.y + this.translateY];
+      return[box.left+ this.translateX,box.top + this.translateY];
     }
 
   }
@@ -107,13 +107,14 @@ var svg = d3.select("svg");
 (function() {
   'use strict';
   d3.selection.prototype.center = function(el,dir){
-    var pos = getDomAttrs(this);
+
     var newPos = centerOn[dir](el);
     this.attr({
       cx: newPos[0],
       cy: newPos[1]
     });
   }
+
 }());
 
 var rect = svg.append("rect").attr({
@@ -122,7 +123,7 @@ var rect = svg.append("rect").attr({
   x:50,
   y:50
 });
-var circle = svg.append("circle").attr({
+var circle = svg.append("g").append("circle").attr({
   r: 20,
   cx:25,
   cy:25
@@ -162,7 +163,7 @@ let centerOn = {
   }
 
 }
-circle.center(rect,'center');
+circle.center(d3.select("g"),'center');
 module.exports = function(el,type){
   return centerOn[type](el);
 }

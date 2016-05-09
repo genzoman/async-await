@@ -77,7 +77,7 @@ let getGroupAttrs = (elem)=>{
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
-      return[box.x+ this.translateX,box.y + this.translateY];
+      return[box.left+ this.translateX,box.top + this.translateY];
     }
 
   }
