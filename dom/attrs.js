@@ -1,5 +1,5 @@
 var d3 = require ("d3");
-var position = require('../position/position');
+
 window.d3 = d3;
 let getRectAttrs = (elem)=>{
 

@@ -8,6 +8,7 @@ var config = {
   svg: null,
   domain:null,
   barPadding:null,
+  height:250,
   width: 250,
   font:{
     'font-size': '12pt',
@@ -20,78 +21,38 @@ var config = {
   orient: 'bottom'
 }
 
-let getDomain = (data,key)=> config.data;
+
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
+
 
 function bars(opts){
   config = getConfig(config,opts);
+  var x = d3.scale.ordinal()
+      .rangeRoundBands([0, config.width], .1)
+      .domain([0,100]);
 
-  let getScale = ()=>{
-    return d3.scale.ordinal().domain(getDomain(config.data))
-      .rangeRoundBands([0,config.width],config.barPadding || .1);
-  }
+  var svg = d3.select('svg');
+  var y = d3.scale.linear().range([config.height,0]);
+  var bar = svg.selectAll("g").data(config.data).enter().append("g");
 
-  let getAxis = ()=> d3.svg.axis().scale(getScale()).orient(config.orient);
+  bar.append("rect")
+     .attr("y", function(d) { return y(d); })
+     .attr("x",function(d,i){
+       return i * 80 + 2;
+     })
+     .attr("transform",function(d,i){
+       return `translate(${i * 10},10)`;
+     })
+     .attr("height", function(d) { return config.height - y(d); })
+     .attr("width", x.rangeBand())
+     .style("fill","blue");
 
-  axis.font = function font(prop,val){
-    var ticks = 0;
-    var currDy = getTextElems().attr("dy");
-    getTextElems()
-      .transition()
-      .duration(600)
-      .attrTween("font-size",function(){
-        ticks++;
-
-        return d3.interpolateString("48pt",val);
-      })
-      .attrTween("dy",function(){
-        return d3.interpolateString(".71em",".70999em");
-      })
-      .attrTween("fill",function(){
-        return d3.interpolateString("yellow","blue");
-      })
-      .each("end",function(){
-        if(--ticks===0){
-          emitter.emit("onTransitionFinshed",+new Date());
-        }
-      });
-
-    return axis;
-  }
-
-
-  let render = ()=>{
-    if(!d3.select('#xAxis').size()){
-        config.group = d3.select(config.id)
-          .append("g")
-          .attr("id","xAxis")
-          .attr("transform",translate(100,100));
-    }
-    config.group.call(getAxis());
-    for(let prop in config.font){
-      getTextElems().attr(prop,config.font[prop]);
-    }
-    return axis;
-  }
-  //
-  axis.width = ()=>config.width;
-  //
-  axis.drag = (opt)=>{
-  var drag = d3.behavior.drag()
-    .on('dragstart',opt.dragstart)
-    .on('drag',opt.drag)
-    .on('dragend',opt.dragend);
-    config.group.call(drag);
-    return axis;
-  }
-  window.d3 = d3;
-  window.axis = axis;
-  var p;
-
-
-  render();
-
-  return axis;
+ bar.append("text")
+     .attr("x", x.rangeBand() / 2)
+     .attr("y", function(d) { return y(d) + 3; })
+     .attr("dy", ".75em")
+     .text(function(d) { return d; });
+  return bars;
 }
+bars();
 module.exports = bars;
