@@ -16,7 +16,8 @@ var config = {
   drag: null,
   group: '',
   orient: 'bottom',
-  enable: true
+  enable: true,
+  translate: ''
 }
 window.axis = axis;
 let getDomain = (data,key)=> config.data;
@@ -30,7 +31,7 @@ module.exports = axis;
 
 function axis(opts){
   config = getConfig(config,opts);
-
+module.exports = axis;
   let getScale = ()=>{
     return d3.scale.ordinal().domain(getDomain(config.data))
       .rangeRoundBands([0,config.width],config.barPadding || .1);
@@ -53,6 +54,8 @@ function axis(opts){
       }
     }
     config.group.call(getAxis()).style("display", config.enable ? null: "none");
+    if(config.transform)
+      config.group.attr("transform",config.transform)
     for(let prop in config.font){
       getTextElems().attr(prop,config.font[prop]);
     }
@@ -81,14 +84,14 @@ function axis(opts){
 
 
   }
-  //
+  //xAxis
   axis.width = ()=>config.width;
   //
-  axis.drag = (opt)=>{
+  axis.drag = ()=>{
   var drag = d3.behavior.drag()
-    .on('dragstart',opt.dragstart)
-    .on('drag',opt.drag)
-    .on('dragend',opt.dragend);
+    .on('dragstart',shrink().dragstart)
+    .on('drag',shrink().drag)
+    .on('dragend',shrink().dragend);
     config.group.call(drag);
     return axis;
   }
@@ -100,9 +103,9 @@ let shrink = ()=>{
   return{
     "dragstart":()=>{},
     "drag":function shrink(){
-      axis({
-        width: horizontalResize.call(this,{width:config.width})
-      });
+      axis(horizontalResize.call(this,{
+        width: config.width
+      }));
     },
     "dragend":()=>{}
   }

@@ -51,7 +51,7 @@ let getCircleAttrs  = (elem)=>{
     cy: +d3.select(elem).attr("cy"),
     width: +d3.select(elem).attr("r"),
     r: +d3.select(elem).attr("r"),
-    height: +d3.select(elem).attr("height"),
+    height: +d3.select(elem).attr("r"),
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
@@ -77,7 +77,7 @@ let getGroupAttrs = (elem)=>{
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
-      return[box.left+ this.translateX,box.top + this.translateY];
+      return[box.width+ this.translateX,box.height + this.translateY];
     }
 
   }
