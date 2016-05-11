@@ -1,3 +1,4 @@
+'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
 var _ = require("underscore");
@@ -9,24 +10,24 @@ var config = {
 module.exports = horizontalResize;
 
 function horizontalResize(opts){
-  var mouse = d3.mouse(this),
-    isRightDrag = mouse[0] <config.width/2,
+
+  var mouse = opts.mouse || d3.mouse(this),
+    currTransform = opts.translate || d3.transform(d3.select(this).attr("transform")).translate,
+    isRightDrag = mouse[0] < opts.width/2,
     factor = isRightDrag ? 1 : -1,
-    event = d3.event ? d3.event : opts.event;
-    var currTransform = d3.transform(d3.select('#xAxis').attr("transform")).translate;
+    event = opts.event || d3.event;
+console.log("mouse x: ",mouse,"event",d3.event);
 
-
-var translate_ = `translate(${currTransform[0] + mouse[0]+ (factor * d3.event.dx)},${currTransform[1]})`;
+var translate_ = `translate(${currTransform[0] + mouse[0]+ (factor * event.dx)},${currTransform[1]})`;
 
 
   let getRightDrag= ()=>{
 
-
-    return config.width - (factor * d3.event.dx);
+    return opts.width - (factor * event.dx);
   }
   let getLeftDrag = ()=>{
-    config.translate = null;
-    return mouse[0] - (factor * d3.event.dx);
+    console.log("left drag")
+    return mouse[0] - (factor * event.dx);
   }
   let getWidth = ()=>{
      if(isRightDrag){
@@ -35,13 +36,7 @@ var translate_ = `translate(${currTransform[0] + mouse[0]+ (factor * d3.event.dx
      return getLeftDrag();
   }
 
-  horizontalResize.width = ()=> isRightDrag ? getRightDrag() : getLeftDrag();
-  var translate = function(){
-    var x = currTransform[0] + mouse[0]+ (factor * d3.event.dx),
-      y = currTransform[1];
-    return isRightDrag  ? translate(x,y) : null;
 
-  }
 
   return {
     width: getWidth(),

@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/genzoman/async-await/issues"
   },
+  "devDependencies":{
+    "chai": "*"
+  },
   "homepage": "https://github.com/genzoman/async-await#readme"
 }

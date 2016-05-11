@@ -31,7 +31,7 @@ module.exports = axis;
 
 function axis(opts){
   config = getConfig(config,opts);
-module.exports = axis;
+
   let getScale = ()=>{
     return d3.scale.ordinal().domain(getDomain(config.data))
       .rangeRoundBands([0,config.width],config.barPadding || .1);
@@ -54,8 +54,8 @@ module.exports = axis;
       }
     }
     config.group.call(getAxis()).style("display", config.enable ? null: "none");
-    if(config.transform)
-      config.group.attr("transform",config.transform)
+    if(config.translate)
+      config.group.attr("transform",config.translate)
     for(let prop in config.font){
       getTextElems().attr(prop,config.font[prop]);
     }
@@ -112,3 +112,6 @@ let shrink = ()=>{
 
 
 }
+
+﻿
+axis({width: 200,id: 'svg'}).drag();
