@@ -116,4 +116,3 @@ let shrink = ()=>{
 }
 
 ﻿
-axis({width: 200,id: 'svg'}).drag();

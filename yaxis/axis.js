@@ -10,6 +10,7 @@ var config = {
   domain:null,
   barPadding:null,
   width: 250,
+  height:200,
   font:{
     'font-size': '12pt',
     'fill': 'blue'
@@ -56,18 +57,35 @@ function axis(newOpts){
       config.group.call(getAxis());
   }
   else{
-    return config.group.call(getAxis());
+    if(config.translate)
+      return config.group.call(getAxis()).attr("transform",config.translate);
+    else
+      return config.group.call(getAxis())
   }
-  axis.drag = (opt)=>{
-    var drag = d3.behavior.drag()
-      .on('dragstart',opt.dragstart)
-      .on('drag',opt.drag)
-      .on('dragend',opt.dragend);
-
-      config.group.call(drag);
-      return axis;
+  axis.drag = ()=>{
+  var drag = d3.behavior.drag()
+    .on('dragstart',shrink().dragstart)
+    .on('drag',shrink().drag)
+    .on('dragend',shrink().dragend);
+    config.group.call(drag);
+    return axis;
   }
 
   return axis;
 }
+let shrink = ()=>{
+  return{
+    "dragstart":()=>{},
+    "drag":function shrink(){
+      console.log("width",config.width);
+      axis(verticalResize.call(this,{
+        height: config.height
+      }));
+    },
+    "dragend":()=>{}
+  }
+
+
+}
+axis({height: 200,id: 'svg'}).drag();
 module.exports = axis;
