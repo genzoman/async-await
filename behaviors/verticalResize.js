@@ -1,3 +1,4 @@
+'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
 var mouse;
