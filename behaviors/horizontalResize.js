@@ -12,13 +12,15 @@ module.exports = horizontalResize;
 function horizontalResize(opts){
 
   var mouse = opts.mouse || d3.mouse(this),
-    currTransform = opts.translate || d3.transform(d3.select(this).attr("transform")).translate,
+    currTransform = opts.translate || d3.transform(d3.select(this)
+      .attr("transform")).translate,
     isRightDrag = mouse[0] < opts.width/2,
     factor = isRightDrag ? 1 : -1,
     event = opts.event || d3.event;
 console.log("mouse x: ",mouse,"event",d3.event);
 
-var translate_ = `translate(${currTransform[0] + mouse[0]+ (factor * event.dx)},${currTransform[1]})`;
+var translate_ = isRightDrag ? `translate(${currTransform[0]
+    + mouse[0]+ (factor * event.dx)},${currTransform[1]})` : null;
 
 
   let getRightDrag= ()=>{

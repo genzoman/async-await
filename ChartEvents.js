@@ -1,3 +1,4 @@
+'use strict';
 //ChartEvents.js
 var ee = require("event-emitter");
 var emitter = ee({});

@@ -1,3 +1,4 @@
+'use strict';
 var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
@@ -55,7 +56,7 @@ function axis(opts){
     }
     config.group.call(getAxis()).style("display", config.enable ? null: "none");
     if(config.translate)
-      config.group.attr("transform",config.translate)
+      config.group.attr("transform",config.translate);
     for(let prop in config.font){
       getTextElems().attr(prop,config.font[prop]);
     }
@@ -103,6 +104,7 @@ let shrink = ()=>{
   return{
     "dragstart":()=>{},
     "drag":function shrink(){
+      console.log("width",config.width);
       axis(horizontalResize.call(this,{
         width: config.width
       }));

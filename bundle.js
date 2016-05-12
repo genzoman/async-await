@@ -13,13 +13,15 @@ module.exports = horizontalResize;
 function horizontalResize(opts){
 
   var mouse = opts.mouse || d3.mouse(this),
-    currTransform = opts.translate || d3.transform(d3.select(this).attr("transform")).translate,
+    currTransform = opts.translate || d3.transform(d3.select(this)
+      .attr("transform")).translate,
     isRightDrag = mouse[0] < opts.width/2,
     factor = isRightDrag ? 1 : -1,
     event = opts.event || d3.event;
 console.log("mouse x: ",mouse,"event",d3.event);
 
-var translate_ = `translate(${currTransform[0] + mouse[0]+ (factor * event.dx)},${currTransform[1]})`;
+var translate_ = isRightDrag ? `translate(${currTransform[0]
+    + mouse[0]+ (factor * event.dx)},${currTransform[1]})` : null;
 
 
   let getRightDrag= ()=>{
@@ -70,6 +72,7 @@ module.exports = (x,y)=>{
 }
 
 },{}],4:[function(require,module,exports){
+'use strict';
 var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
@@ -127,7 +130,7 @@ function axis(opts){
     }
     config.group.call(getAxis()).style("display", config.enable ? null: "none");
     if(config.translate)
-      config.group.attr("transform",config.translate)
+      config.group.attr("transform",config.translate);
     for(let prop in config.font){
       getTextElems().attr(prop,config.font[prop]);
     }
@@ -175,6 +178,7 @@ let shrink = ()=>{
   return{
     "dragstart":()=>{},
     "drag":function shrink(){
+      console.log("width",config.width);
       axis(horizontalResize.call(this,{
         width: config.width
       }));
