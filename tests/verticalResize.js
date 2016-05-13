@@ -43,13 +43,15 @@ describe("vertical resize",function(){
       assert.equal(nextState.translate[1],currState.translate[1]-=1)
     });
   });
+  //fix this guy
   describe("drag from bottom",function(){
     it("should shrink the height with negative dy",function(){
       currState.event.dy = -1;
+      currState.mouse = [0,81];
       nextState = verticalResize(currState);
       assert.equal(currState.height+=1,nextState.height);
       var translate_ = translateAsArray(nextState.translate);
-      assert.equal(currState.translate[1],translate_[1]+=1)
+      assert.equal(currState.translate[1],translate_[1])
     });
   });
 });

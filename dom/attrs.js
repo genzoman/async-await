@@ -1,14 +1,21 @@
+'use strict';
 var d3 = require ("d3");
 
-window.d3 = d3;
-let getRectAttrs = (elem)=>{
 
-  var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0]
+let getRectAttrs = (elem)=>{
+  console.log("RECT ATTRS")
+  if(!global){
+    console.log('asdf')
+    elem = d3.select(elem) || elem;
+  }
+  if(elem.node){}
+  var translate = elem.node ? d3.transform(elem.attr("transform"))
+                    : elem.translate();
   return {
-    x: +d3.select(elem).attr("x"),
-    y: +d3.select(elem).attr("y"),
-    width: +d3.select(elem).attr("width"),
-    height: +d3.select(elem).attr("height"),
+    x: +elem.attr("x"),
+    y: +elem.attr("y"),
+    width: +elem.attr("width"),
+    height: +elem.attr("height"),
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
@@ -40,8 +47,9 @@ let getCenter = (elem,middle)=>{
   }
   return fns[type]();
 }
-window.getRectAttrs = getRectAttrs;
+
 let getCircleAttrs  = (elem)=>{
+  console.log("al;sdfjl;kadsjfl;adjfl;kasd")
   elem = elem.node ? elem.node() : elem;
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0];
   var attrs = {
@@ -67,9 +75,10 @@ let getCircleAttrs  = (elem)=>{
   }
   return attrs;
 }
-window.getCircleAttrs = getCircleAttrs;
+
 let getGroupAttrs = (elem)=>{
   var box = elem.getBoundingClientRect();
+  console.log("asdf")
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0]
   return {
     width: +box.width.toFixed(2),
@@ -84,6 +93,7 @@ let getGroupAttrs = (elem)=>{
 }
 
 let getAttrs = (elem)=>{
+  console.log("getAttrs");
   elem = elem.node ? elem.node() : elem;
   switch(elem.tagName.toLowerCase()){
     case 'rect':
@@ -96,4 +106,7 @@ let getAttrs = (elem)=>{
       return getGroupAttrs(elem);
   }
 }
-module.exports = getAttrs;
+module.exports = function(elem){
+  console.log("elem",elem);
+  return getAttrs(elem);
+};
