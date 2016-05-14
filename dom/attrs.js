@@ -8,7 +8,7 @@ let getRectAttrs = (elem)=>{
     console.log('asdf')
     elem = d3.select(elem) || elem;
   }
-  if(elem.node){}
+
   var translate = elem.node ? d3.transform(elem.attr("transform")).translate
                     : [0,0];
   return {

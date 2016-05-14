@@ -28,7 +28,6 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
     return opts.width - (factor * event.dx);
   }
   let getLeftDrag = ()=>{
-    console.log("left drag")
     return mouse[0] - (factor * event.dx);
   }
   let getWidth = ()=>{

@@ -1,4 +1,18 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var d3 = require("d3");
+var centerPos = require("../../positions/center");
+(function() {
+  'use strict';
+  d3.selection.prototype.center = function(el,type){
+    var coords = centerPos.call(this,el,type);
+    this.attr({
+      "x": coords[0],
+      "y": coords[1]
+    });
+  };
+}());
+
+},{"../../positions/center":3,"d3":4}],2:[function(require,module,exports){
 (function (global){
 'use strict';
 var d3 = require ("d3");
@@ -107,14 +121,14 @@ module.exports = function(elem){
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"d3":3}],2:[function(require,module,exports){
+},{"d3":4}],3:[function(require,module,exports){
 var d3 = require("d3");
 
 
 
 var getDomAttrs = require('../dom/attrs');
 
-/*module.exports = */function center(el,type){
+module.exports = function center(el,type){
 var pos = getDomAttrs(this),
   parentPos = getDomAttrs(el);
   var attrs = {
@@ -149,8 +163,7 @@ var pos = getDomAttrs(this),
     bottomRight(el){
 
       var x = pos.absolutePosition()[0] + pos.width + Math.abs(pos.x - parentPos.x),
-        y = pos.absolutePosition()[1]
-          + (parentPos.height-pos.height) + Math.abs(pos.y - parentPos.y)
+        y = pos.absolutePosition()[1]+ (parentPos.height-pos.height) + Math.abs(pos.y - parentPos.y)
         return [x,y];
     },
     bottomLeft(el){
@@ -162,25 +175,8 @@ var pos = getDomAttrs(this),
   }
   return attrs[type](el);
 }
-var svg = d3.select("svg");
-bigRect = svg.append("rect").attr({
-  x: 10,
-  y: 10,
-  height:100,
-  width:100,
-  fill:'green'
-});
-smallRect = svg.append("rect").attr({
-  x:0,
-  y:0,
-  height: 50,
-  width: 50,
-  fill: 'blue'
-});
-var coords = center.call(smallRect.node(),bigRect.node(),'bottomLeft');
-console.log(coords);
 
-},{"../dom/attrs":1,"d3":3}],3:[function(require,module,exports){
+},{"../dom/attrs":2,"d3":4}],4:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -9735,4 +9731,4 @@ console.log(coords);
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}]},{},[2]);
+},{}]},{},[1]);

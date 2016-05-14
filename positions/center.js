@@ -4,7 +4,7 @@ var d3 = require("d3");
 
 var getDomAttrs = require('../dom/attrs');
 
-/*module.exports = */function center(el,type){
+module.exports = function center(el,type){
 var pos = getDomAttrs(this),
   parentPos = getDomAttrs(el);
   var attrs = {
@@ -39,8 +39,7 @@ var pos = getDomAttrs(this),
     bottomRight(el){
 
       var x = pos.absolutePosition()[0] + pos.width + Math.abs(pos.x - parentPos.x),
-        y = pos.absolutePosition()[1]
-          + (parentPos.height-pos.height) + Math.abs(pos.y - parentPos.y)
+        y = pos.absolutePosition()[1]+ (parentPos.height-pos.height) + Math.abs(pos.y - parentPos.y)
         return [x,y];
     },
     bottomLeft(el){
@@ -52,20 +51,3 @@ var pos = getDomAttrs(this),
   }
   return attrs[type](el);
 }
-var svg = d3.select("svg");
-bigRect = svg.append("rect").attr({
-  x: 10,
-  y: 10,
-  height:100,
-  width:100,
-  fill:'green'
-});
-smallRect = svg.append("rect").attr({
-  x:0,
-  y:0,
-  height: 50,
-  width: 50,
-  fill: 'blue'
-});
-var coords = center.call(smallRect.node(),bigRect.node(),'bottomLeft');
-console.log(coords);

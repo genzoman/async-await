@@ -26,8 +26,8 @@ d3.select('svg').attr({
 });
 
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-function axis(newOpts){
-  config = getConfig(config,newOpts);
+function axis(opts){
+  config = getConfig(config,opts);
   let getDomain = ()=>{
     return [0,d3.max(config.data)];
   };
@@ -77,7 +77,6 @@ let shrink = ()=>{
   return{
     "dragstart":()=>{},
     "drag":function shrink(){
-      console.log("width",config.width);
       axis(verticalResize.call(this,{
         height: config.height
       }));

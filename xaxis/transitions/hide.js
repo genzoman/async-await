@@ -2,7 +2,7 @@ var d3 = require("d3");
 const getPathString = require("../../paths/getPathString");
 var _ = require("underscore");
 let getConfig = (opts)=> _.extend(config_,opts);
-window.d3 = d3;
+
 (function(){
   d3.transition.prototype.hide = hide_;
 })()

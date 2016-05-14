@@ -20,7 +20,7 @@ var config = {
   enable: true,
   translate: ''
 }
-window.axis = axis;
+
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
@@ -104,7 +104,6 @@ let shrink = ()=>{
   return{
     "dragstart":()=>{},
     "drag":function shrink(){
-      console.log("width",config.width);
       axis(horizontalResize.call(this,{
         width: config.width
       }));

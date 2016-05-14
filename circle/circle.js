@@ -55,9 +55,7 @@ function circle(opts){
       })
     })
   }
-  circle.fadeColor('blue').then(x=>{
-    x.color("green").animate('r',100);
-  })
+  
   circle.color = (color)=>{
     circle_.attr("fill",color);
     return circle;
