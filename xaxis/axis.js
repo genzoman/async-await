@@ -3,17 +3,18 @@ var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
 var horizontalResize = require('../behaviors/horizontalResize');
-var shrink = require("../behaviors/shrink");
+var resize = require("../behaviors/resize");
 var config = {
   svg: null,
   domain:null,
+  parent: null,
   barPadding:null,
   width: 250,
   font:{
     'font-size': '12pt',
     'fill': 'blue'
   },
-  id:null,
+  id:'#xAxis',
   data: [1,2,3,4],
   drag: null,
   group: '',
@@ -22,9 +23,11 @@ var config = {
   translate: ''
 }
 
+require('../bars/extensions/id.js');
+
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
+let getTextElems = ()=> d3.select(config.id).selectAll("text");
 require("./transitions/hide");
 
 
@@ -45,23 +48,29 @@ function axis(opts){
 
 
   let render = ()=>{
-    if(!d3.select('#xAxis').size()){
-      config.group = d3.select(config.id)
+    if(d3.select(config.id).size()===0){
+        config.group = d3.select(config.parent)
           .append("g")
-          .attr("id","xAxis")
-          .attr("transform",translate(100,20))
+          .id("xAxis")
+          .attr("transform",translate(100,20));
+
+      config.group.call(getAxis());
 
       if(!config.enable){
         config.group.style("display","none");
       }
     }
-    config.group.call(getAxis()).style("display", config.enable ? null: "none");
-    if(config.translate)
-      config.group.attr("transform",config.translate);
-    for(let prop in config.font){
-      getTextElems().attr(prop,config.font[prop]);
+    else{
+      if(config.translate)
+        config.group.attr("transform",config.translate);
+      for(let prop in config.font){
+        getTextElems().attr(prop,config.font[prop]);
+      }
+      config.group.call(getAxis()).style("display", config.enable ? null: "none");
+      return axis;
     }
-    return axis;
+
+
   }
 
   axis.hide = function(){
@@ -90,13 +99,17 @@ function axis(opts){
   axis.width = ()=>config.width;
   //
   axis.drag = ()=>{
-    config.group.call(shrink.call(this,axis,config));
+      config.group.call(resize.call(this,axis,config));
     return axis;
   }
 
   render();
   return axis;
 }
-axis({height: 200,id: 'svg'}).drag();
+axis({
+  parent: 'svg'
+}).drag();
+
+window.axis = axis;
 module.exports = axis;
 ﻿

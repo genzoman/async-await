@@ -10,6 +10,7 @@ var config = {
   svg: null,
   domain:null,
   barPadding:null,
+  parent:null,
   width: 250,
   height:200,
   font:{
@@ -22,6 +23,7 @@ var config = {
   group: '',
   orient: 'left'
 }
+
 d3.select('svg').attr({
   height: ()=> 1000
 });
@@ -50,10 +52,10 @@ function axis(opts){
       .ticks(10)
       .tickSize(1);
   }
-  if(!d3.select('#yAxis').size()){
+  if(!d3.select(config.id).size()){
     config.group = d3.select(config.id)
       .append("g")
-      .attr("id","yAxis")
+      .attr("id",config.id)
       .attr("transform",translate(100,10));
       config.group.call(getAxis());
   }
@@ -72,5 +74,5 @@ function axis(opts){
 }
 
 
-axis({height: 200,id: 'svg'}).drag();
+
 module.exports = axis;

@@ -1,4 +1,13 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var d3 = require("d3");
+(function() {
+  'use strict';
+  d3.selection.prototype.id = function(_){
+    return _ ? this.attr("id",_) : this.attr("id");
+  }
+}());
+
+},{"d3":9}],2:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -46,7 +55,7 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
   }
 }
 
-},{"../utils/translate":5,"d3":8,"underscore":9}],2:[function(require,module,exports){
+},{"../utils/translate":6,"d3":9,"underscore":10}],3:[function(require,module,exports){
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
@@ -78,7 +87,7 @@ function shrink(axis,config){
 
 }
 
-},{"./horizontalResize":1,"./verticalResize":3,"d3":8}],3:[function(require,module,exports){
+},{"./horizontalResize":2,"./verticalResize":4,"d3":9}],4:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -113,7 +122,7 @@ function verticalResize(opts){
 }
 module.exports = verticalResize;
 
-},{"../utils/translate":5,"d3":8}],4:[function(require,module,exports){
+},{"../utils/translate":6,"d3":9}],5:[function(require,module,exports){
 var d3 = require("d3");
 function getPathString(orient,config){
     var h,w;
@@ -131,29 +140,30 @@ function getPathString(orient,config){
 
 module.exports = getPathString;
 
-},{"d3":8}],5:[function(require,module,exports){
+},{"d3":9}],6:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
 var horizontalResize = require('../behaviors/horizontalResize');
-var shrink = require("../behaviors/shrink");
+var resize = require("../behaviors/resize");
 var config = {
   svg: null,
   domain:null,
+  parent: null,
   barPadding:null,
   width: 250,
   font:{
     'font-size': '12pt',
     'fill': 'blue'
   },
-  id:null,
+  id:'#xAxis',
   data: [1,2,3,4],
   drag: null,
   group: '',
@@ -162,9 +172,11 @@ var config = {
   translate: ''
 }
 
+require('../bars/extensions/id.js');
+
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-let getTextElems = ()=> d3.select("#xAxis").selectAll("text");
+let getTextElems = ()=> d3.select(config.id).selectAll("text");
 require("./transitions/hide");
 
 
@@ -185,23 +197,29 @@ function axis(opts){
 
 
   let render = ()=>{
-    if(!d3.select('#xAxis').size()){
-      config.group = d3.select(config.id)
+    if(d3.select(config.id).size()===0){
+        config.group = d3.select(config.parent)
           .append("g")
-          .attr("id","xAxis")
-          .attr("transform",translate(100,20))
+          .id("xAxis")
+          .attr("transform",translate(100,20));
+
+      config.group.call(getAxis());
 
       if(!config.enable){
         config.group.style("display","none");
       }
     }
-    config.group.call(getAxis()).style("display", config.enable ? null: "none");
-    if(config.translate)
-      config.group.attr("transform",config.translate);
-    for(let prop in config.font){
-      getTextElems().attr(prop,config.font[prop]);
+    else{
+      if(config.translate)
+        config.group.attr("transform",config.translate);
+      for(let prop in config.font){
+        getTextElems().attr(prop,config.font[prop]);
+      }
+      config.group.call(getAxis()).style("display", config.enable ? null: "none");
+      return axis;
     }
-    return axis;
+
+
   }
 
   axis.hide = function(){
@@ -230,18 +248,22 @@ function axis(opts){
   axis.width = ()=>config.width;
   //
   axis.drag = ()=>{
-    config.group.call(shrink.call(this,axis,config));
+      config.group.call(resize.call(this,axis,config));
     return axis;
   }
 
   render();
   return axis;
 }
-axis({height: 200,id: 'svg'}).drag();
+axis({
+  parent: 'svg'
+}).drag();
+
+window.axis = axis;
 module.exports = axis;
 ﻿
 
-},{"../behaviors/horizontalResize":1,"../behaviors/shrink":2,"../utils/translate":5,"./transitions/hide":7,"d3":8,"underscore":9}],7:[function(require,module,exports){
+},{"../bars/extensions/id.js":1,"../behaviors/horizontalResize":2,"../behaviors/resize":3,"../utils/translate":6,"./transitions/hide":8,"d3":9,"underscore":10}],8:[function(require,module,exports){
 var d3 = require("d3");
 const getPathString = require("../../paths/getPathString");
 var _ = require("underscore");
@@ -314,7 +336,7 @@ let hide = ()=>{
 
 }
 
-},{"../../paths/getPathString":4,"d3":8,"underscore":9}],8:[function(require,module,exports){
+},{"../../paths/getPathString":5,"d3":9,"underscore":10}],9:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -9869,7 +9891,7 @@ let hide = ()=>{
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -11419,4 +11441,4 @@ let hide = ()=>{
   }
 }.call(this));
 
-},{}]},{},[6]);
+},{}]},{},[7]);
