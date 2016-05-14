@@ -5,6 +5,7 @@ var Promise = require("bluebird");
 var _ = require("underscore");
 var translate = require("../utils/translate");
 var verticalResize = require('../behaviors/verticalResize');
+var shrink = require("../behaviors/shrink");
 var config = {
   svg: null,
   domain:null,
@@ -63,28 +64,13 @@ function axis(opts){
       return config.group.call(getAxis())
   }
   axis.drag = ()=>{
-  var drag = d3.behavior.drag()
-    .on('dragstart',shrink().dragstart)
-    .on('drag',shrink().drag)
-    .on('dragend',shrink().dragend);
-    config.group.call(drag);
+    config.group.call(shrink.call(this,axis,config));
     return axis;
   }
 
   return axis;
 }
-let shrink = ()=>{
-  return{
-    "dragstart":()=>{},
-    "drag":function shrink(){
-      axis(verticalResize.call(this,{
-        height: config.height
-      }));
-    },
-    "dragend":()=>{}
-  }
 
 
-}
 axis({height: 200,id: 'svg'}).drag();
 module.exports = axis;

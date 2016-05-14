@@ -1,12 +1,13 @@
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
-function shrink(config){
+module.exports = shrink;
+function shrink(axis,config){
   var dragObj = (config.orient==="bottom" || config.orient==="top") ?
     dragObj = {
       "dragstart":()=>{},
       "drag":function(){
-        return horizontalResize.call(this,{width:config.width})
+        axis(horizontalResize.call(this,{width:config.width}));
       },
       "dragend":()=>{}
     }
@@ -14,6 +15,7 @@ function shrink(config){
     dragObj = {
       "dragstart":()=>{},
       "drag":function shrink(){
+
         axis(verticalResize.call(this,{
           height: config.height
         }));
@@ -24,5 +26,5 @@ function shrink(config){
       .on('dragstart',dragObj.dragstart)
       .on('drag',dragObj.drag)
       .on('dragend',dragObj.dragend);
-    
+
 }

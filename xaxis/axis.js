@@ -3,6 +3,7 @@ var d3 = require('d3');
 var translate = require('../utils/translate');
 var _ = require("underscore");
 var horizontalResize = require('../behaviors/horizontalResize');
+var shrink = require("../behaviors/shrink");
 var config = {
   svg: null,
   domain:null,
@@ -28,7 +29,7 @@ require("./transitions/hide");
 
 
 //EXPORT
-module.exports = axis;
+
 
 function axis(opts){
   config = getConfig(config,opts);
@@ -89,29 +90,13 @@ function axis(opts){
   axis.width = ()=>config.width;
   //
   axis.drag = ()=>{
-  var drag = d3.behavior.drag()
-    .on('dragstart',shrink().dragstart)
-    .on('drag',shrink().drag)
-    .on('dragend',shrink().dragend);
-    config.group.call(drag);
+    config.group.call(shrink.call(this,axis,config));
     return axis;
   }
 
   render();
   return axis;
 }
-let shrink = ()=>{
-  return{
-    "dragstart":()=>{},
-    "drag":function shrink(){
-      axis(horizontalResize.call(this,{
-        width: config.width
-      }));
-    },
-    "dragend":()=>{}
-  }
-
-
-}
-
+axis({height: 200,id: 'svg'}).drag();
+module.exports = axis;
 ﻿
