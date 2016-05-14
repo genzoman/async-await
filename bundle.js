@@ -7,7 +7,25 @@ var d3 = require("d3");
   }
 }());
 
-},{"d3":9}],2:[function(require,module,exports){
+},{"d3":10}],2:[function(require,module,exports){
+var d3 = require("d3");
+var _ = require("underscore");
+
+(function() {
+  'use strict';
+  d3.selection.prototype.parent = function(p){
+    var self = _.clone(this),
+      retVal={};
+    if(p){
+      var parent = this.node().parentNode
+      this.remove();
+
+      d3.select("svg").append("g").id('#'+p).html(self[0][0].innerHTML);
+    }
+  }
+}());
+
+},{"d3":10,"underscore":11}],3:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -55,7 +73,7 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
   }
 }
 
-},{"../utils/translate":6,"d3":9,"underscore":10}],3:[function(require,module,exports){
+},{"../utils/translate":7,"d3":10,"underscore":11}],4:[function(require,module,exports){
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
@@ -87,7 +105,7 @@ function shrink(axis,config){
 
 }
 
-},{"./horizontalResize":2,"./verticalResize":4,"d3":9}],4:[function(require,module,exports){
+},{"./horizontalResize":3,"./verticalResize":5,"d3":10}],5:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -122,7 +140,7 @@ function verticalResize(opts){
 }
 module.exports = verticalResize;
 
-},{"../utils/translate":6,"d3":9}],5:[function(require,module,exports){
+},{"../utils/translate":7,"d3":10}],6:[function(require,module,exports){
 var d3 = require("d3");
 function getPathString(orient,config){
     var h,w;
@@ -140,13 +158,13 @@ function getPathString(orient,config){
 
 module.exports = getPathString;
 
-},{"d3":9}],6:[function(require,module,exports){
+},{"d3":10}],7:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require('../utils/translate');
@@ -172,14 +190,14 @@ var config = {
   translate: ''
 }
 
-require('../bars/extensions/id.js');
+require('../bars/extensions/id-d3.js');
 
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select(config.id).selectAll("text");
 require("./transitions/hide");
 
-
+require('../bars/extensions/parent-d3.js');
 //EXPORT
 
 
@@ -203,7 +221,7 @@ function axis(opts){
           .id("xAxis")
           .attr("transform",translate(100,20));
 
-      config.group.call(getAxis());
+      config.group.call(getAxis()).parent("newParent");
 
       if(!config.enable){
         config.group.style("display","none");
@@ -259,11 +277,12 @@ axis({
   parent: 'svg'
 }).drag();
 
+
 window.axis = axis;
 module.exports = axis;
 ﻿
 
-},{"../bars/extensions/id.js":1,"../behaviors/horizontalResize":2,"../behaviors/resize":3,"../utils/translate":6,"./transitions/hide":8,"d3":9,"underscore":10}],8:[function(require,module,exports){
+},{"../bars/extensions/id-d3.js":1,"../bars/extensions/parent-d3.js":2,"../behaviors/horizontalResize":3,"../behaviors/resize":4,"../utils/translate":7,"./transitions/hide":9,"d3":10,"underscore":11}],9:[function(require,module,exports){
 var d3 = require("d3");
 const getPathString = require("../../paths/getPathString");
 var _ = require("underscore");
@@ -336,7 +355,7 @@ let hide = ()=>{
 
 }
 
-},{"../../paths/getPathString":5,"d3":9,"underscore":10}],9:[function(require,module,exports){
+},{"../../paths/getPathString":6,"d3":10,"underscore":11}],10:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -9891,7 +9910,7 @@ let hide = ()=>{
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -11441,4 +11460,4 @@ let hide = ()=>{
   }
 }.call(this));
 
-},{}]},{},[7]);
+},{}]},{},[8]);
