@@ -21,7 +21,6 @@ var config = {
   orient: 'bottom'
 }
 
-
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 
 

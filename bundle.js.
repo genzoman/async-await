@@ -1,24 +1,29 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (global){
+'use strict';
 var d3 = require ("d3");
 
-window.d3 = d3;
-let getRectAttrs = (elem)=>{
 
-  var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0]
+let getRectAttrs = (elem)=>{
+  console.log("RECT ATTRS")
+  if(!global || window){
+    console.log('asdf')
+    elem = d3.select(elem) || elem;
+  }
+  if(elem.node){}
+  var translate = elem.node ? d3.transform(elem.attr("transform")).translate
+                    : [0,0];
   return {
-    x: +d3.select(elem).attr("x"),
-    y: +d3.select(elem).attr("y"),
-    width: +d3.select(elem).attr("width"),
-    height: +d3.select(elem).attr("height"),
+    x: +elem.attr("x"),
+    y: +elem.attr("y"),
+    width: +elem.attr("width"),
+    height: +elem.attr("height"),
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
       var x = this.x + this.translateX,
         y = this.y + this.translateY
       return [x,y];
-    },
-    centerTo:function(el,type){
-      return getCenter(el,type);
     }
   }
 }
@@ -41,8 +46,9 @@ let getCenter = (elem,middle)=>{
   }
   return fns[type]();
 }
-window.getRectAttrs = getRectAttrs;
+
 let getCircleAttrs  = (elem)=>{
+  console.log("al;sdfjl;kadsjfl;adjfl;kasd")
   elem = elem.node ? elem.node() : elem;
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0];
   var attrs = {
@@ -52,7 +58,7 @@ let getCircleAttrs  = (elem)=>{
     cy: +d3.select(elem).attr("cy"),
     width: +d3.select(elem).attr("r"),
     r: +d3.select(elem).attr("r"),
-    height: +d3.select(elem).attr("height"),
+    height: +d3.select(elem).attr("r"),
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
@@ -60,17 +66,14 @@ let getCircleAttrs  = (elem)=>{
         y = this.y + this.translateY
       return [x,y];
     },
-    centerTo(el,type){
-      return getCenter(el,type);
-
-    },
     fill:"blue"
   }
   return attrs;
 }
-window.getCircleAttrs = getCircleAttrs;
+
 let getGroupAttrs = (elem)=>{
   var box = elem.getBoundingClientRect();
+  console.log("asdf")
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0]
   return {
     width: +box.width.toFixed(2),
@@ -78,13 +81,14 @@ let getGroupAttrs = (elem)=>{
     translateX: translate[0],
     translateY: translate[1],
     absolutePosition:function(){
-      return[box.left+ this.translateX,box.height + this.translateY];
+      return[box.width+ this.translateX,box.height + this.translateY];
     }
 
   }
 }
 
 let getAttrs = (elem)=>{
+  console.log("getAttrs");
   elem = elem.node ? elem.node() : elem;
   switch(elem.tagName.toLowerCase()){
     case 'rect':
@@ -97,87 +101,84 @@ let getAttrs = (elem)=>{
       return getGroupAttrs(elem);
   }
 }
-module.exports = getAttrs;
+module.exports = function(elem){
+  console.log("elem",elem);
+  return getAttrs(elem);
+};
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"d3":3}],2:[function(require,module,exports){
 var d3 = require("d3");
-window.d3 = d3;
-var svg = d3.select("svg");
 
-(function() {
-  'use strict';
 
-  d3.selection.prototype.center = function(el,dir){
-    var pos = getDomAttrs(this);
-    var newPos = centerOn[dir](el);
-    switch(this.node().tagName.toLowerCase()){
-      case "circle":
-        this.attr({
-          cx: newPos[0] - (pos.r/2),
-          cy: newPos[1] - (pos.r/2)
-        });
-        break;
-      case "rect":
-      this.attr({
-        x: newPos[0] - (pos.width),
-        y: newPos[1] - (pos.width)
-      });
-    }
-
-  }
-
-}());
-
-var rect = svg.append("rect").attr({
-  height:50,
-  width:50,
-  x:50,
-  y:50
-});
-var circle = svg.append("g").append("circle").attr({
-  r: 20,
-  cx:25,
-  cy:25
-})
-.style("fill","green");
 
 var getDomAttrs = require('../dom/attrs');
 
-let centerOn = {
-  topLeft(el){
-    var pos = getDomAttrs(el);
-    return [pos.x,pos.y]
-  },
-  center(el){
-    var pos = getDomAttrs(el);
-    var x = pos.absolutePosition()[0] + (pos.width/2),
-      y = pos.absolutePosition()[1] + (pos.height/2);
-      return [x,y];
-  },
-  topMiddle(el){
-    var pos = getDomAttrs(el);
-    var x = pos.absolutePosition()[0] + (pos.width/2),
-      y = pos.absolutePosition()[1];
-      return [x,y];
-  },
-  topRight(el){
-    var pos = getDomAttrs(el);
-    var x = pos.absolutePosition()[0] + pos.width,
-      y = pos.absolutePosition()[1];
-      return [x,y];
-  },
-  bottomRight(el){
-    var pos = getDomAttrs(el);
-    var x = pos.absolutePosition()[0] + pos.width,
-      y = pos.absolutePosition()[1] + pos.height;
-      return [x,y];
-  }
+/*module.exports = */function center(el,type){
+var pos = getDomAttrs(this),
+  parentPos = getDomAttrs(el);
+  var attrs = {
+    topLeft(el){
+      var parentAbsPos = parentPos.absolutePosition();
+      return [parentAbsPos[0]+ pos.x,parentAbsPos[1]+pos.y];
+    },
+    center(el){
+      var xMiddle = (parentPos.width - pos.width)/2,
+        yMiddle = (parentPos.height - pos.height)/2;
 
+
+        newX = parentPos.absolutePosition()[0] + xMiddle,
+        newY = parentPos.absolutePosition()[1] + yMiddle;
+
+
+        return [newX,newY];
+
+    },
+    topMiddle(el){
+
+      var x = pos.absolutePosition()[0] + (parentPos.width-pos.width)/2,
+        y = pos.absolutePosition()[1];
+        return [x,y];
+    },
+    topRight(el){
+
+      var x = pos.absolutePosition()[0] + pos.width + Math.abs(pos.x - parentPos.x),
+        y = pos.absolutePosition()[1] +  Math.abs(pos.y - parentPos.y);
+        return [x,y];
+    },
+    bottomRight(el){
+
+      var x = pos.absolutePosition()[0] + pos.width + Math.abs(pos.x - parentPos.x),
+        y = pos.absolutePosition()[1]
+          + (parentPos.height-pos.height) + Math.abs(pos.y - parentPos.y)
+        return [x,y];
+    },
+    bottomLeft(el){
+      var x = pos.absolutePosition()[0],
+        y = pos.absolutePosition()[1]
+          + (parentPos.height-pos.height) + Math.abs(pos.y - parentPos.y)
+        return [x,y];
+    }
+  }
+  return attrs[type](el);
 }
-rect.center(d3.select("g"),'center');
-module.exports = function(el,type){
-  return centerOn[type](el);
-}
+var svg = d3.select("svg");
+bigRect = svg.append("rect").attr({
+  x: 10,
+  y: 10,
+  height:100,
+  width:100,
+  fill:'green'
+});
+smallRect = svg.append("rect").attr({
+  x:0,
+  y:0,
+  height: 50,
+  width: 50,
+  fill: 'blue'
+});
+var coords = center.call(smallRect.node(),bigRect.node(),'bottomLeft');
+console.log(coords);
 
 },{"../dom/attrs":1,"d3":3}],3:[function(require,module,exports){
 !function() {

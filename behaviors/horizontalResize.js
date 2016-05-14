@@ -17,7 +17,7 @@ function horizontalResize(opts){
     isRightDrag = mouse[0] < opts.width/2,
     factor = isRightDrag ? 1 : -1,
     event = opts.event || d3.event;
-console.log("mouse x: ",mouse,"event",d3.event);
+
 
 var translate_ = isRightDrag ? `translate(${currTransform[0]
     + mouse[0]+ (factor * event.dx)},${currTransform[1]})` : null;

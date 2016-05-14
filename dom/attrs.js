@@ -4,13 +4,13 @@ var d3 = require ("d3");
 
 let getRectAttrs = (elem)=>{
   console.log("RECT ATTRS")
-  if(!global){
+  if(!global || window){
     console.log('asdf')
     elem = d3.select(elem) || elem;
   }
   if(elem.node){}
-  var translate = elem.node ? d3.transform(elem.attr("transform"))
-                    : elem.translate();
+  var translate = elem.node ? d3.transform(elem.attr("transform")).translate
+                    : [0,0];
   return {
     x: +elem.attr("x"),
     y: +elem.attr("y"),
@@ -22,9 +22,6 @@ let getRectAttrs = (elem)=>{
       var x = this.x + this.translateX,
         y = this.y + this.translateY
       return [x,y];
-    },
-    centerTo:function(el,type){
-      return getCenter(el,type);
     }
   }
 }
@@ -66,10 +63,6 @@ let getCircleAttrs  = (elem)=>{
       var x = this.x + this.translateX,
         y = this.y + this.translateY
       return [x,y];
-    },
-    centerTo(el,type){
-      return getCenter(el,type);
-
     },
     fill:"blue"
   }

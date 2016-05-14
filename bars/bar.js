@@ -5,7 +5,7 @@ var horizontalResize = require('../behaviors/horizontalResize');
 var ee = require("event-emitter");
 var emitter = ee({});
 emitter.on('onTransitionFinshed',(time)=>{
-  console.log("this is the time",time);
+  
 });
 
 var config = {
