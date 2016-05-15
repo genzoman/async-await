@@ -11,7 +11,7 @@ var config = {
   domain:null,
   barPadding:null,
   parent:null,
-  width: 250,
+  width: 200,
   height:200,
   font:{
     'font-size': '12pt',
@@ -23,6 +23,10 @@ var config = {
   group: '',
   orient: 'left'
 }
+d3.select("svg").attr({
+  height: 1000,
+  width:1000
+});
 
 let getOrdinalDomain = (data,key)=>config.data;
 let getLinearDomain = ()=>[0,d3.max(config.data)];
@@ -44,7 +48,10 @@ let ordinalScale = ()=>{
 let linearScale = ()=>{
   return d3.scale.linear().range(getRange()).domain(getDomain());
 }
-
+let axisTranslate = ()=>{
+  return config.orient==="bottom" ? translate(100,10+config.height)
+    : translate(100,10);
+}
 let getAxis =()=> {
   return d3.svg.axis()
     .scale(getScale())
@@ -60,7 +67,7 @@ function axis(opts){
     config.group = d3.select(config.parent)
       .append("g")
       .attr("id",config.id)
-      .attr("transform",translate(100,10));
+      .attr("transform",axisTranslate());
       config.group.call(getAxis());
   }
   else{
