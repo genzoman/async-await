@@ -1,3 +1,4 @@
+//TODO write an actually meaningful test
 'use strict';
 var center = require('../positions/center');
 var assert = require('assert');

@@ -12,6 +12,7 @@ var config = {
   width: 250,
   font:{
     'font-size': '12pt',
+    'family': 'Timew New Roman',
     'fill': 'blue'
   },
   id:'#xAxis',
@@ -25,28 +26,31 @@ var config = {
 }
 
 require('../bars/extensions/id-d3.js');
+require("./transitions/hide");
 
 let getDomain = (data,key)=> config.data;
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select(config.id).selectAll("text");
-require("./transitions/hide");
+let getScale = ()=>{
+  return d3.scale.ordinal().domain(getDomain(config.data))
+    .rangeRoundBands([0,config.width],config.barPadding || .1);
+}
+
+let getAxis = ()=> {
+  return d3.svg.axis()
+    .scale(getScale())
+    .orient(config.orient)
+    .ticks(10)
+    .tickSize(1);
+}
 
 
 //EXPORT
 
 
 function axis(opts){
+
   config = getConfig(config,opts);
-
-  let getScale = ()=>{
-    return d3.scale.ordinal().domain(getDomain(config.data))
-      .rangeRoundBands([0,config.width],config.barPadding || .1);
-  }
-
-  let getAxis = ()=> {
-    return d3.svg.axis().scale(getScale()).orient(config.orient);
-  }
-
 
   let render = ()=>{
     if(d3.select(config.id).size()===0){
@@ -67,14 +71,23 @@ function axis(opts){
       for(let prop in config.font){
         getTextElems().attr(prop,config.font[prop]);
       }
-      config.group.call(getAxis()).style("display", config.enable ? null: "none");
+      config.group.call(getAxis())
+        .style("display", config.enable ? null: "none");
 
     }
     axis.drag();
+    axis.font();
     return axis;
 
   }
-
+  axis.font = function(){
+    getTextElems().style({
+      'font-size': config.font['font-size'],
+      'font-family': config.font['font-family'],
+      'fill': config.font['fill']
+    });
+    return axis;
+  }
   axis.hide = function(){
     d3.select("path").transition().hide({
       range: [0, config.width],

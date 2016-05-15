@@ -1,11 +1,11 @@
 'use strict';
-//throwing an error when dragging
+
 var d3 = require("d3");
 var Promise = require("bluebird");
 var _ = require("underscore");
 var translate = require("../utils/translate");
 var verticalResize = require('../behaviors/verticalResize');
-var shrink = require("../behaviors/shrink");
+var resize = require("../behaviors/resize");
 var config = {
   svg: null,
   domain:null,
@@ -24,36 +24,40 @@ var config = {
   orient: 'left'
 }
 
-d3.select('svg').attr({
-  height: ()=> 1000
-});
+let getOrdinalDomain = (data,key)=>config.data;
+let getLinearDomain = ()=>[0,d3.max(config.data)];
+let getDomain = ()=> {
+  return config.orient==="left" ? getLinearDomain() : getOrdinalDomain();
+};
 
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
+let getTextElems = ()=> d3.select(config.id).selectAll("text");
+let getRange = ()=> [config.height,0];
+let getScale = ()=>{
+  return config.orient==="left" ? linearScale() : ordinalScale();
+
+}
+let ordinalScale = ()=>{
+  return d3.scale.ordinal().domain(getDomain(config.data))
+    .rangeRoundBands([0,config.width],config.barPadding || .1);
+}
+let linearScale = ()=>{
+  return d3.scale.linear().range(getRange()).domain(getDomain());
+}
+
+let getAxis =()=> {
+  return d3.svg.axis()
+    .scale(getScale())
+    .orient(config.orient)
+    .ticks(10)
+    .tickSize(1);
+}
+window.axis;
 function axis(opts){
   config = getConfig(config,opts);
-  let getDomain = ()=>{
-    return [0,d3.max(config.data)];
-  };
-  let getRange = ()=>{
-    return [config.height,0];
-  }
 
-
-  let getScale = ()=>{
-    return d3.scale
-      .linear()
-      .range(getRange())
-      .domain(getDomain());
-  }
-  let getAxis =()=> {
-    return d3.svg.axis()
-      .scale(getScale())
-      .orient("left")
-      .ticks(10)
-      .tickSize(1);
-  }
   if(!d3.select(config.id).size()){
-    config.group = d3.select(config.id)
+    config.group = d3.select(config.parent)
       .append("g")
       .attr("id",config.id)
       .attr("transform",translate(100,10));
@@ -61,7 +65,9 @@ function axis(opts){
   }
   else{
     if(config.translate)
-      return config.group.call(getAxis()).attr("transform",config.translate);
+      return config.group
+        .call(getAxis())
+        .attr("transform",config.translate);
     else
       return config.group.call(getAxis())
   }
@@ -73,6 +79,11 @@ function axis(opts){
   return axis;
 }
 
+axis({
+  parent: '#svg',
+  orient: 'left',
+  id: '#yAxis'
+})
 
 
 module.exports = axis;

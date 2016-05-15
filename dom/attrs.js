@@ -100,6 +100,5 @@ let getAttrs = (elem)=>{
   }
 }
 module.exports = function(elem){
-  console.log("elem",elem);
   return getAttrs(elem);
 };
