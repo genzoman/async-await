@@ -72,8 +72,14 @@ function axis(opts){
       return config.group.call(getAxis())
   }
   axis.drag = ()=>{
-    config.group.call(shrink.call(this,axis,config));
-    return axis;
+    var noDrag = d3.behavior.drag()
+      .on("dragstart",null)
+      .on("drag",null)
+      .on("dragend",null);
+    if(config.hasDrag)
+      config.group.call(resize.call(this,axis,config));
+
+    else config.group.call(noDrag);
   }
 
   return axis;
@@ -84,6 +90,10 @@ axis({
   orient: 'left',
   id: '#yAxis'
 })
-
+axis({
+    parent: '#svg',
+    orient: 'bottom',
+    id: '#xAxis'
+})
 
 module.exports = axis;
