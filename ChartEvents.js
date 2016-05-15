@@ -2,7 +2,7 @@
 //ChartEvents.js
 var ee = require("event-emitter");
 var emitter = ee({});
-var axis = require("./xaxis/axis");
+var axis = require("./axis/axis");
 require("./rect/hide");
 
 emitter.on('onButtonClick',(time)=>{
@@ -19,7 +19,9 @@ emitter.on('onFontChange',function(data){
 emitter.on('onAxisToggle',function(data){
   axis.toggle();
 });
-emitter.on('onAxisHide',function(data){
-  axis.hide();
+emitter.on('onDragChange',function(data){
+  axis({
+    hasDrag: data
+  })
 });
 module.exports = emitter;

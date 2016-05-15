@@ -1,5 +1,34 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
+//ChartEvents.js
+var ee = require("event-emitter");
+var emitter = ee({});
+var axis = require("./axis/axis");
+require("./rect/hide");
+
+emitter.on('onButtonClick',(time)=>{
+  console.log("the time when you click the button",time);
+});
+
+emitter.on('onFontChanged',function(data){
+  axis(data);
+});
+
+emitter.on('onFontChange',function(data){
+  axis(data);
+});
+emitter.on('onAxisToggle',function(data){
+  axis.toggle();
+});
+emitter.on('onDragChange',function(data){
+  axis({
+    hasDrag: data
+  })
+});
+module.exports = emitter;
+
+},{"./axis/axis":2,"./rect/hide":6,"event-emitter":25}],2:[function(require,module,exports){
+'use strict';
 
 var d3 = require("d3");
 var Promise = require("bluebird");
@@ -86,6 +115,7 @@ function axis(opts){
     }
 
   }
+  
   axis.font = function(opt){
     config = getConfig(opt);
     dy = config.orient === "left" ? ".32em" : ".71em";
@@ -95,10 +125,9 @@ function axis(opts){
       'fill': config.font['fill'],
       'dy': dy
     })
-
-
     return axis;
   }
+
   axis.width = ()=>config.width;
   axis.height = ()=>config.height;
   axis.config = ()=>config;
@@ -123,7 +152,7 @@ function axis(opts){
 
 module.exports = axis;
 
-},{"../behaviors/resize":3,"../utils/translate":6,"bluebird":7,"d3":9,"underscore":24}],2:[function(require,module,exports){
+},{"../behaviors/resize":4,"../utils/translate":8,"bluebird":9,"d3":11,"underscore":26}],3:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -171,7 +200,7 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
   }
 }
 
-},{"../utils/translate":6,"d3":9,"underscore":24}],3:[function(require,module,exports){
+},{"../utils/translate":8,"d3":11,"underscore":26}],4:[function(require,module,exports){
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
@@ -203,7 +232,7 @@ function shrink(axis,config){
 
 }
 
-},{"./horizontalResize":2,"./verticalResize":4,"d3":9}],4:[function(require,module,exports){
+},{"./horizontalResize":3,"./verticalResize":5,"d3":11}],5:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -238,14 +267,72 @@ function verticalResize(opts){
 }
 module.exports = verticalResize;
 
-},{"../utils/translate":6,"d3":9}],5:[function(require,module,exports){
+},{"../utils/translate":8,"d3":11}],6:[function(require,module,exports){
+var d3 = require("d3");
+var _ = require("underscore");
+let getConfig = (opts)=> _.extend(config_,opts);
+var rect = d3.select("rect");
+rect.insert("rect").attr({
+  x:100,
+  y:100,
+  fill: "blue"
+});
+
+setTimeout(function(){
+  hide('horizontal','leftRight');
+},2000);
+function hide(orient,dir){
+  if(orient==="vertical"){
+    if(dir==="bottomUp"){
+      return d3.select("rect").transition().duration(400).attrTween("height",function(){
+        var w = +d3.select(this).attr("height");
+        return d3.interpolateNumber(w--,0);
+      });
+    }
+    if(dir==="topDown"){
+      return d3.select("rect").transition().duration(400).attrTween("height",function(){
+        var w = +d3.select(this).attr("height");
+        return d3.interpolateNumber(w--,0);
+      }).attrTween("y",function(){
+        var y = +d3.select(this).attr("y");
+        var w = +d3.select(this).attr("width")
+        return d3.interpolateNumber(y,w/2);
+      });
+    }
+  }
+  else{
+    //
+    if(dir==="rightLeft"){
+      return d3.select("rect").transition().duration(400).attrTween("width",function(){
+        var w = +d3.select(this).attr("width");
+        return d3.interpolateNumber(w--,0);
+      });
+    }
+    if(dir==="leftRight"){
+      return d3.select("rect").transition().duration(400).attrTween("width",function(){
+        var w = +d3.select(this).attr("width");
+        return d3.interpolateNumber(w--,0);
+      }).attrTween("x",function(){
+        var x = +d3.select(this).attr("x");
+        var w = +d3.select(this).attr("width")
+        return d3.interpolateNumber(x,w/2);
+      });
+    }
+  }
+
+
+
+
+}
+
+},{"d3":11,"underscore":26}],7:[function(require,module,exports){
 //uiBind.js
 const d3 = require("d3");
 const _ = require("underscore");
 const axis = require("../axis/axis");
-var ee = require("event-emitter");
-var emitter = ee({});
 
+var ee = require("event-emitter");
+var emitter = require("../ChartEvents");
 let getConfig = (config,opts) => _.extend(config,opts);
 let config = {
   name: '',
@@ -256,9 +343,7 @@ let config = {
     type: "checkbox",
     "checked": true
   },
-  boundTo:{
-
-  }
+  event: 'onDragChange'
 
 }
 function uiBind(obj){
@@ -267,8 +352,8 @@ function uiBind(obj){
     .attr("id",config.id)
     .append(config.tagName)
     .attr(config.attr)
-    .on("change",function(){
-      emitter.emit('onDragChange',!axis.config().hasDrag);
+    .on("change",()=>{
+      emitter.emit(config.event,!axis.config().hasDrag);
     });
 
 }
@@ -280,24 +365,16 @@ axis({
 });
 
 uiBind(config)
-//
-emitter.on('onFontChanged',function(data){
-  console.log("hello world",data);
-});
-emitter.on('onDragChange',function(data){
-  axis({
-    hasDrag:data
-  });
-});
+
 //
 
-},{"../axis/axis":1,"d3":9,"event-emitter":23,"underscore":24}],6:[function(require,module,exports){
+},{"../ChartEvents":1,"../axis/axis":2,"d3":11,"event-emitter":25,"underscore":26}],8:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
 }
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -5755,7 +5832,7 @@ module.exports = ret;
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":25}],8:[function(require,module,exports){
+},{"_process":27}],10:[function(require,module,exports){
 'use strict';
 
 var assign        = require('es5-ext/object/assign')
@@ -5820,7 +5897,7 @@ d.gs = function (dscr, get, set/*, options*/) {
 	return !options ? desc : assign(normalizeOpts(options), desc);
 };
 
-},{"es5-ext/object/assign":10,"es5-ext/object/is-callable":13,"es5-ext/object/normalize-options":17,"es5-ext/string/#/contains":20}],9:[function(require,module,exports){
+},{"es5-ext/object/assign":12,"es5-ext/object/is-callable":15,"es5-ext/object/normalize-options":19,"es5-ext/string/#/contains":22}],11:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -15375,14 +15452,14 @@ d.gs = function (dscr, get, set/*, options*/) {
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? Object.assign
 	: require('./shim');
 
-},{"./is-implemented":11,"./shim":12}],11:[function(require,module,exports){
+},{"./is-implemented":13,"./shim":14}],13:[function(require,module,exports){
 'use strict';
 
 module.exports = function () {
@@ -15393,7 +15470,7 @@ module.exports = function () {
 	return (obj.foo + obj.bar + obj.trzy) === 'razdwatrzy';
 };
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 var keys  = require('../keys')
@@ -15417,21 +15494,21 @@ module.exports = function (dest, src/*, …srcn*/) {
 	return dest;
 };
 
-},{"../keys":14,"../valid-value":19}],13:[function(require,module,exports){
+},{"../keys":16,"../valid-value":21}],15:[function(require,module,exports){
 // Deprecated
 
 'use strict';
 
 module.exports = function (obj) { return typeof obj === 'function'; };
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? Object.keys
 	: require('./shim');
 
-},{"./is-implemented":15,"./shim":16}],15:[function(require,module,exports){
+},{"./is-implemented":17,"./shim":18}],17:[function(require,module,exports){
 'use strict';
 
 module.exports = function () {
@@ -15441,7 +15518,7 @@ module.exports = function () {
 	} catch (e) { return false; }
 };
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 var keys = Object.keys;
@@ -15450,7 +15527,7 @@ module.exports = function (object) {
 	return keys(object == null ? object : Object(object));
 };
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var forEach = Array.prototype.forEach, create = Object.create;
@@ -15469,7 +15546,7 @@ module.exports = function (options/*, …options*/) {
 	return result;
 };
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 module.exports = function (fn) {
@@ -15477,7 +15554,7 @@ module.exports = function (fn) {
 	return fn;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 module.exports = function (value) {
@@ -15485,14 +15562,14 @@ module.exports = function (value) {
 	return value;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./is-implemented')()
 	? String.prototype.contains
 	: require('./shim');
 
-},{"./is-implemented":21,"./shim":22}],21:[function(require,module,exports){
+},{"./is-implemented":23,"./shim":24}],23:[function(require,module,exports){
 'use strict';
 
 var str = 'razdwatrzy';
@@ -15502,7 +15579,7 @@ module.exports = function () {
 	return ((str.contains('dwa') === true) && (str.contains('foo') === false));
 };
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 var indexOf = String.prototype.indexOf;
@@ -15511,7 +15588,7 @@ module.exports = function (searchString/*, position*/) {
 	return indexOf.call(this, searchString, arguments[1]) > -1;
 };
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 var d        = require('d')
@@ -15645,7 +15722,7 @@ module.exports = exports = function (o) {
 };
 exports.methods = methods;
 
-},{"d":8,"es5-ext/object/valid-callable":18}],24:[function(require,module,exports){
+},{"d":10,"es5-ext/object/valid-callable":20}],26:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -17195,7 +17272,7 @@ exports.methods = methods;
   }
 }.call(this));
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -17288,4 +17365,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[5]);
+},{}]},{},[7]);

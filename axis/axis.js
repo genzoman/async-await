@@ -85,6 +85,7 @@ function axis(opts){
     }
 
   }
+  
   axis.font = function(opt){
     config = getConfig(opt);
     dy = config.orient === "left" ? ".32em" : ".71em";
@@ -94,10 +95,9 @@ function axis(opts){
       'fill': config.font['fill'],
       'dy': dy
     })
-
-
     return axis;
   }
+
   axis.width = ()=>config.width;
   axis.height = ()=>config.height;
   axis.config = ()=>config;
