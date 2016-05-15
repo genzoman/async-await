@@ -22,6 +22,12 @@ emitter.on('onAxisToggle',function(data){
 emitter.on('onDragChange',function(data){
   axis({
     hasDrag: data
-  })
+  });
+
+});
+emitter.on('onOrientChange',function(data){
+  axis({
+    orient: data
+  });
 });
 module.exports = emitter;

@@ -32,7 +32,7 @@ let options = select.selectAll("option")
     .text((d,i)=> d.text)
     .attr("value",(d,i)=>d.value);
 
-
+  return dropdown;  
 }
 var data = [
   {
