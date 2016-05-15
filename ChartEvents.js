@@ -9,6 +9,10 @@ emitter.on('onButtonClick',(time)=>{
   console.log("the time when you click the button",time);
 });
 
+emitter.on('onFontChanged',function(data){
+  axis(data);
+});
+
 emitter.on('onFontChange',function(data){
   axis(data);
 });

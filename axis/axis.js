@@ -4,7 +4,6 @@ var d3 = require("d3");
 var Promise = require("bluebird");
 var _ = require("underscore");
 var translate = require("../utils/translate");
-var verticalResize = require('../behaviors/verticalResize');
 var resize = require("../behaviors/resize");
 var config = {
   svg: null,
@@ -21,8 +20,10 @@ var config = {
   data: [1,2,3,4],
   drag: null,
   group: '',
-  orient: 'left'
+  orient: 'left',
+  hasDrag: true
 }
+
 d3.select("svg").attr({
   height: 1000,
   width:1000
@@ -52,6 +53,7 @@ let axisTranslate = ()=>{
   return config.orient==="bottom" ? translate(100,10+config.height)
     : translate(100,10);
 }
+
 let getAxis =()=> {
   return d3.svg.axis()
     .scale(getScale())
@@ -68,7 +70,9 @@ function axis(opts){
       .append("g")
       .attr("id",config.id)
       .attr("transform",axisTranslate());
+
       config.group.call(getAxis());
+
   }
   else{
     if(config.translate)
@@ -78,6 +82,23 @@ function axis(opts){
     else
       return config.group.call(getAxis())
   }
+  axis.font = function(opt){
+    config = getConfig(opt);
+    dy = config.orient === "left" ? ".32em" : ".71em";
+    getTextElems().style({
+      'font-size': config.font['font-size'],
+      'font-family': config.font['font-family'],
+      'fill': config.font['fill'],
+      'dy': dy
+    })
+
+
+    return axis;
+  }
+  axis.width = ()=>config.width;
+  axis.height = ()=>config.height;
+  axis.config = ()=>config;
+
   axis.drag = ()=>{
     var noDrag = d3.behavior.drag()
       .on("dragstart",null)
@@ -87,20 +108,13 @@ function axis(opts){
       config.group.call(resize.call(this,axis,config));
 
     else config.group.call(noDrag);
+
+    return axis;
   }
 
   return axis;
 }
 
-axis({
-  parent: '#svg',
-  orient: 'left',
-  id: '#yAxis'
-})
-axis({
-    parent: '#svg',
-    orient: 'bottom',
-    id: '#xAxis'
-})
+
 
 module.exports = axis;
