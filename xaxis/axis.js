@@ -30,7 +30,7 @@ let getConfig = (config,newOpts)=> _.extend(config,newOpts);
 let getTextElems = ()=> d3.select(config.id).selectAll("text");
 require("./transitions/hide");
 
-require('../bars/extensions/parent-d3.js');
+
 //EXPORT
 
 
@@ -54,7 +54,7 @@ function axis(opts){
           .id("xAxis")
           .attr("transform",translate(100,20));
 
-      config.group.call(getAxis()).parent("newParent");
+      config.group.call(getAxis());
 
       if(!config.enable){
         config.group.style("display","none");
@@ -110,7 +110,7 @@ axis({
   parent: 'svg'
 }).drag();
 
-
+require('../bars/extensions/parent-d3.js');
 window.axis = axis;
 module.exports = axis;
 ﻿
