@@ -242,8 +242,14 @@ function hide(orient,dir){
 },{"d3":14,"underscore":29}],9:[function(require,module,exports){
 const d3 = require("d3");
 var emitter = require("../ChartEvents");
-let binding = {
-  enable:true
+var axis = require("../xaxis/axis");
+
+axis({
+  parent: 'svg'
+}).drag();
+
+let binding ={
+    hasDrag: axis.config().hasDrag
 }
 
 
@@ -251,15 +257,17 @@ function checkbox(){
   return d3.select("body")
     .append("input")
     .attr("type","checkbox")
-    .attr("checked",binding.enable)
+    .attr("checked",binding.hasDrag)
     .on("change",function(){
-      binding.enable = !binding.enable;
-      emitter.emit("onAxisHide",binding);
+      binding.hasDrag = !binding.hasDrag;
+      //emitter.emit("onAxisHide",binding);
+      axis(binding);
     });
 }
+checkbox();
 module.exports = checkbox;
 
-},{"../ChartEvents":1,"d3":14}],10:[function(require,module,exports){
+},{"../ChartEvents":1,"../xaxis/axis":11,"d3":14}],10:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
@@ -288,7 +296,8 @@ var config = {
   group: '',
   orient: 'bottom',
   enable: true,
-  translate: ''
+  translate: '',
+  hasDrag:true
 }
 
 require('../bars/extensions/id-d3.js');
@@ -335,9 +344,10 @@ function axis(opts){
         getTextElems().attr(prop,config.font[prop]);
       }
       config.group.call(getAxis()).style("display", config.enable ? null: "none");
-      return axis;
-    }
 
+    }
+    axis.drag();
+    return axis;
 
   }
 
@@ -367,16 +377,21 @@ function axis(opts){
   axis.width = ()=>config.width;
   //
   axis.drag = ()=>{
-      config.group.call(resize.call(this,axis,config));
+      var noDrag = d3.behavior.drag()
+        .on("dragstart",null)
+        .on("drag",null)
+        .on("dragend",null);
+      if(config.hasDrag)
+        config.group.call(resize.call(this,axis,config));
+
+      else config.group.call(noDrag);
     return axis;
   }
 
   render();
   return axis;
 }
-axis({
-  parent: 'svg'
-}).drag();
+
 
 require('../bars/extensions/parent-d3.js');
 window.axis = axis;

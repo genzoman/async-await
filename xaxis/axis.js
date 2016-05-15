@@ -20,7 +20,8 @@ var config = {
   group: '',
   orient: 'bottom',
   enable: true,
-  translate: ''
+  translate: '',
+  hasDrag:true
 }
 
 require('../bars/extensions/id-d3.js');
@@ -67,9 +68,10 @@ function axis(opts){
         getTextElems().attr(prop,config.font[prop]);
       }
       config.group.call(getAxis()).style("display", config.enable ? null: "none");
-      return axis;
-    }
 
+    }
+    axis.drag();
+    return axis;
 
   }
 
@@ -99,16 +101,21 @@ function axis(opts){
   axis.width = ()=>config.width;
   //
   axis.drag = ()=>{
-      config.group.call(resize.call(this,axis,config));
+      var noDrag = d3.behavior.drag()
+        .on("dragstart",null)
+        .on("drag",null)
+        .on("dragend",null);
+      if(config.hasDrag)
+        config.group.call(resize.call(this,axis,config));
+
+      else config.group.call(noDrag);
     return axis;
   }
 
   render();
   return axis;
 }
-axis({
-  parent: 'svg'
-}).drag();
+
 
 require('../bars/extensions/parent-d3.js');
 window.axis = axis;
