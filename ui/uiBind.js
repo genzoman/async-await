@@ -1,12 +1,9 @@
 //uiBind.js
 const d3 = require("d3");
 const _ = require("underscore");
-const axis = require("../yaxis/axis");
+const axis = require("../axis/axis");
 var ee = require("event-emitter");
 var emitter = ee({});
-emitter.on('onFontChanged',function(data){
-  console.log("hello world",data);
-});
 
 let getConfig = (config,opts) => _.extend(config,opts);
 let config = {
@@ -16,11 +13,9 @@ let config = {
   id: 'checkbox',
   attr:{
     type: "checkbox",
-    "checked": "checked"
+    "checked": true
   },
-  boundTo:{
-    
-  }
+  event: 'onDragChange'
 
 }
 function uiBind(obj){
@@ -30,14 +25,25 @@ function uiBind(obj){
     .append(config.tagName)
     .attr(config.attr)
     .on("change",function(){
-      emitter.emit('onFontChanged',axis.config());
+      emitter.emit(config.event,!axis.config().hasDrag);
     });
 
 }
 axis({
   height: 100,
   parent: '#svg',
-  orient: "left"
+  orient: "left",
+  id: 'yAxis'
 });
 
 uiBind(config)
+//
+emitter.on('onFontChanged',function(data){
+  console.log("hello world",data);
+});
+emitter.on(config.event,function(data){
+  axis({
+    hasDrag:data
+  });
+});
+//

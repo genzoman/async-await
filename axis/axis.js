@@ -65,7 +65,7 @@ window.axis;
 function axis(opts){
   config = getConfig(config,opts);
 
-  if(!d3.select(config.id).size()){
+  if(!d3.select('#'+config.id).size()){
     config.group = d3.select(config.parent)
       .append("g")
       .attr("id",config.id)
@@ -79,8 +79,11 @@ function axis(opts){
       return config.group
         .call(getAxis())
         .attr("transform",config.translate);
-    else
-      return config.group.call(getAxis())
+    else{
+      axis.drag();
+      return config.group.call(getAxis());
+    }
+
   }
   axis.font = function(opt){
     config = getConfig(opt);
@@ -111,7 +114,7 @@ function axis(opts){
 
     return axis;
   }
-
+  axis.drag();
   return axis;
 }
 

@@ -1,171 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
-var d3 = require('d3');
-var translate = require("../utils/translate");
-var _ = require("underscore");
-var getConfig = (config,opts)=> _.extend(config,opts);
-var config = {
-  translate:''
-
-}
-module.exports = horizontalResize;
-
-function horizontalResize(opts){
-
-  var mouse = opts.mouse || d3.mouse(this),
-    currTransform = opts.translate || d3.transform(d3.select(this)
-      .attr("transform")).translate,
-    isRightDrag = mouse[0] < opts.width/2,
-    factor = isRightDrag ? 1 : -1,
-    event = opts.event || d3.event;
-
-
-var translate_ = isRightDrag ? `translate(${currTransform[0]
-    + mouse[0]+ (factor * event.dx)},${currTransform[1]})` : null;
-
-
-  let getRightDrag= ()=>{
-
-    return opts.width - (factor * event.dx);
-  }
-  let getLeftDrag = ()=>{
-    return mouse[0] - (factor * event.dx);
-  }
-  let getWidth = ()=>{
-     if(isRightDrag){
-       return getRightDrag();
-     }
-     return getLeftDrag();
-  }
-
-
-
-  return {
-    width: getWidth(),
-    translate: translate_
-  }
-}
-
-},{"../utils/translate":5,"d3":9,"underscore":24}],2:[function(require,module,exports){
-var d3 = require('d3');
-var horizontalResize = require('./horizontalResize');
-var verticalResize = require('./verticalResize');
-module.exports = shrink;
-function shrink(axis,config){
-  var dragObj = (config.orient==="bottom" || config.orient==="top") ?
-    dragObj = {
-      "dragstart":()=>{},
-      "drag":function(){
-        axis(horizontalResize.call(this,{width:config.width}));
-      },
-      "dragend":()=>{}
-    }
-    :
-    dragObj = {
-      "dragstart":()=>{},
-      "drag":function shrink(){
-
-        axis(verticalResize.call(this,{
-          height: config.height
-        }));
-      },
-      "dragend":()=>{}
-    }
-    return d3.behavior.drag()
-      .on('dragstart',dragObj.dragstart)
-      .on('drag',dragObj.drag)
-      .on('dragend',dragObj.dragend);
-
-}
-
-},{"./horizontalResize":1,"./verticalResize":3,"d3":9}],3:[function(require,module,exports){
-'use strict';
-var d3 = require('d3');
-var translate = require("../utils/translate");
-var mouse;
-
-
-function verticalResize(opts){
-  var mouse = opts.mouse || d3.mouse(this),
-    currTransform = opts.translate || d3.transform(d3.select(this)
-      .attr("transform")).translate,
-    isBottomDrag = mouse[1] < opts.height/2,
-    factor = isBottomDrag ? 1 : -1,
-    event = opts.event || d3.event;
-
-    var translate_ = isBottomDrag ? `translate(${currTransform[0]},${currTransform[1] + mouse[1] + (factor * event.dy)})`: null;
-
-    let getTopDrag = ()=>{
-
-      return opts.height - (factor * event.dy);
-    }
-    let getBottomDrag = ()=>{
-
-      return mouse[1] - (factor * event.dy);
-    }
-    let getHeight = ()=>{
-      return getTopDrag();
-    }
-    return {
-      height: getHeight(),
-      translate: translate_
-    }
-}
-module.exports = verticalResize;
-
-},{"../utils/translate":5,"d3":9}],4:[function(require,module,exports){
-//uiBind.js
-const d3 = require("d3");
-const _ = require("underscore");
-const axis = require("../yaxis/axis");
-var ee = require("event-emitter");
-var emitter = ee({});
-emitter.on('onFontChanged',function(data){
-  console.log("hello world",data);
-});
-
-let getConfig = (config,opts) => _.extend(config,opts);
-let config = {
-  name: '',
-  parent:'body',
-  tagName: 'input',
-  id: 'checkbox',
-  attr:{
-    type: "checkbox",
-    "checked": "checked"
-  },
-  event:function(){
-
-  }
-
-}
-function uiBind(obj){
-  config = getConfig(config,obj);
-  var g = d3.select(config.parent)
-    .attr("id",config.id)
-    .append(config.tagName)
-    .attr(config.attr)
-    .on("change",function(){
-      emitter.emit('onFontChanged',axis.config());
-    });
-
-}
-axis({
-  height: 100,
-  parent: '#svg',
-  orient: "left"
-});
-
-uiBind(config)
-
-},{"../yaxis/axis":6,"d3":9,"event-emitter":23,"underscore":24}],5:[function(require,module,exports){
-
-module.exports = (x,y)=>{
-  return 'translate('+x+','+y+')';
-}
-
-},{}],6:[function(require,module,exports){
-'use strict';
 
 var d3 = require("d3");
 var Promise = require("bluebird");
@@ -232,7 +66,7 @@ window.axis;
 function axis(opts){
   config = getConfig(config,opts);
 
-  if(!d3.select(config.id).size()){
+  if(!d3.select('#'+config.id).size()){
     config.group = d3.select(config.parent)
       .append("g")
       .attr("id",config.id)
@@ -246,8 +80,11 @@ function axis(opts){
       return config.group
         .call(getAxis())
         .attr("transform",config.translate);
-    else
-      return config.group.call(getAxis())
+    else{
+      axis.drag();
+      return config.group.call(getAxis());
+    }
+
   }
   axis.font = function(opt){
     config = getConfig(opt);
@@ -278,7 +115,7 @@ function axis(opts){
 
     return axis;
   }
-
+  axis.drag();
   return axis;
 }
 
@@ -286,7 +123,181 @@ function axis(opts){
 
 module.exports = axis;
 
-},{"../behaviors/resize":2,"../utils/translate":5,"bluebird":7,"d3":9,"underscore":24}],7:[function(require,module,exports){
+},{"../behaviors/resize":3,"../utils/translate":6,"bluebird":7,"d3":9,"underscore":24}],2:[function(require,module,exports){
+'use strict';
+var d3 = require('d3');
+var translate = require("../utils/translate");
+var _ = require("underscore");
+var getConfig = (config,opts)=> _.extend(config,opts);
+var config = {
+  translate:''
+
+}
+module.exports = horizontalResize;
+
+function horizontalResize(opts){
+
+  var mouse = opts.mouse || d3.mouse(this),
+    currTransform = opts.translate || d3.transform(d3.select(this)
+      .attr("transform")).translate,
+    isRightDrag = mouse[0] < opts.width/2,
+    factor = isRightDrag ? 1 : -1,
+    event = opts.event || d3.event;
+
+
+var translate_ = isRightDrag ? `translate(${currTransform[0]
+    + mouse[0]+ (factor * event.dx)},${currTransform[1]})` : null;
+
+
+  let getRightDrag= ()=>{
+
+    return opts.width - (factor * event.dx);
+  }
+  let getLeftDrag = ()=>{
+    return mouse[0] - (factor * event.dx);
+  }
+  let getWidth = ()=>{
+     if(isRightDrag){
+       return getRightDrag();
+     }
+     return getLeftDrag();
+  }
+
+
+
+  return {
+    width: getWidth(),
+    translate: translate_
+  }
+}
+
+},{"../utils/translate":6,"d3":9,"underscore":24}],3:[function(require,module,exports){
+var d3 = require('d3');
+var horizontalResize = require('./horizontalResize');
+var verticalResize = require('./verticalResize');
+module.exports = shrink;
+function shrink(axis,config){
+  var dragObj = (config.orient==="bottom" || config.orient==="top") ?
+    dragObj = {
+      "dragstart":()=>{},
+      "drag":function(){
+        axis(horizontalResize.call(this,{width:config.width}));
+      },
+      "dragend":()=>{}
+    }
+    :
+    dragObj = {
+      "dragstart":()=>{},
+      "drag":function shrink(){
+
+        axis(verticalResize.call(this,{
+          height: config.height
+        }));
+      },
+      "dragend":()=>{}
+    }
+    return d3.behavior.drag()
+      .on('dragstart',dragObj.dragstart)
+      .on('drag',dragObj.drag)
+      .on('dragend',dragObj.dragend);
+
+}
+
+},{"./horizontalResize":2,"./verticalResize":4,"d3":9}],4:[function(require,module,exports){
+'use strict';
+var d3 = require('d3');
+var translate = require("../utils/translate");
+var mouse;
+
+
+function verticalResize(opts){
+  var mouse = opts.mouse || d3.mouse(this),
+    currTransform = opts.translate || d3.transform(d3.select(this)
+      .attr("transform")).translate,
+    isBottomDrag = mouse[1] < opts.height/2,
+    factor = isBottomDrag ? 1 : -1,
+    event = opts.event || d3.event;
+
+    var translate_ = isBottomDrag ? `translate(${currTransform[0]},${currTransform[1] + mouse[1] + (factor * event.dy)})`: null;
+
+    let getTopDrag = ()=>{
+
+      return opts.height - (factor * event.dy);
+    }
+    let getBottomDrag = ()=>{
+
+      return mouse[1] - (factor * event.dy);
+    }
+    let getHeight = ()=>{
+      return getTopDrag();
+    }
+    return {
+      height: getHeight(),
+      translate: translate_
+    }
+}
+module.exports = verticalResize;
+
+},{"../utils/translate":6,"d3":9}],5:[function(require,module,exports){
+//uiBind.js
+const d3 = require("d3");
+const _ = require("underscore");
+const axis = require("../axis/axis");
+var ee = require("event-emitter");
+var emitter = ee({});
+
+let getConfig = (config,opts) => _.extend(config,opts);
+let config = {
+  name: '',
+  parent:'body',
+  tagName: 'input',
+  id: 'checkbox',
+  attr:{
+    type: "checkbox",
+    "checked": true
+  },
+  boundTo:{
+
+  }
+
+}
+function uiBind(obj){
+  config = getConfig(config,obj);
+  var g = d3.select(config.parent)
+    .attr("id",config.id)
+    .append(config.tagName)
+    .attr(config.attr)
+    .on("change",function(){
+      emitter.emit('onDragChange',!axis.config().hasDrag);
+    });
+
+}
+axis({
+  height: 100,
+  parent: '#svg',
+  orient: "left",
+  id: 'yAxis'
+});
+
+uiBind(config)
+//
+emitter.on('onFontChanged',function(data){
+  console.log("hello world",data);
+});
+emitter.on('onDragChange',function(data){
+  axis({
+    hasDrag:data
+  });
+});
+//
+
+},{"../axis/axis":1,"d3":9,"event-emitter":23,"underscore":24}],6:[function(require,module,exports){
+
+module.exports = (x,y)=>{
+  return 'translate('+x+','+y+')';
+}
+
+},{}],7:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -17277,4 +17288,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[4]);
+},{}]},{},[5]);
