@@ -40,6 +40,7 @@ axis({
   orient: "bottom",
   id: 'yAxis'
 });
+
 var newOrient = {
   name: '',
   parent:'body',

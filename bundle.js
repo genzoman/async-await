@@ -10,9 +10,7 @@ emitter.on('onButtonClick',(time)=>{
   console.log("the time when you click the button",time);
 });
 
-emitter.on('onFontChanged',function(data){
-  axis(data);
-});
+
 
 emitter.on('onFontChange',function(data){
   axis(data);
@@ -72,7 +70,7 @@ let getDomain = ()=> {
 };
 
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-let getTextElems = ()=> d3.select(config.id).selectAll("text");
+
 let getRange = ()=> [config.height,0];
 let getScale = ()=>{
   return config.orient==="left" ? linearScale() : ordinalScale();
@@ -101,6 +99,8 @@ window.axis;
 function axis(opts){
   config = getConfig(config,opts);
 
+  let getTextElems = ()=> d3.select('#'+config.id).selectAll("text");
+
   if(!d3.select('#'+config.id).size()){
     config.group = d3.select(config.parent)
       .append("g")
@@ -117,14 +117,14 @@ function axis(opts){
         .attr("transform",config.translate);
     else{
       axis.drag();
+      axis.font();
       return config.group.call(getAxis());
     }
 
   }
-  
-  axis.font = function(opt){
-    config = getConfig(opt);
-    dy = config.orient === "left" ? ".32em" : ".71em";
+
+  axis.font = function(){
+    let dy = config.orient === "left" ? ".32em" : ".71em";
     getTextElems().style({
       'font-size': config.font['font-size'],
       'font-family': config.font['font-family'],
@@ -151,6 +151,7 @@ function axis(opts){
     return axis;
   }
   axis.drag();
+
   return axis;
 }
 
@@ -332,72 +333,81 @@ function hide(orient,dir){
 }
 
 },{"d3":11,"underscore":26}],7:[function(require,module,exports){
-//uiBind.js
 const d3 = require("d3");
-const _ = require("underscore");
+const emitter =require("../ChartEvents");
 const axis = require("../axis/axis");
+const _ = require("underscore");
 
-var ee = require("event-emitter");
-var emitter = require("../ChartEvents");
-let getConfig = (config,opts) => _.extend(config,opts);
-let config = {
-  name: '',
-  parent:'body',
-  tagName: 'input',
-  id: 'checkbox',
-  attr:{
-    type: "checkbox",
-    "checked": true
-  },
-  event: {
-    name: 'onDragChange',
-    type: 'change',
-    data: ()=>!axis.config().hasDrag,
-    dispatch:(e)=>{
-      emitter.emit(config.event.name,config.event.data())
-    }
-  }
-
-}
-function uiBind(obj){
-  config = getConfig(config,obj);
-  var g = d3.select(config.parent)
-    .attr("id",config.id)
-    .append(config.tagName)
-    .attr(config.attr)
-    .on(config.event.type,config.event.dispatch);
-
-}
 axis({
-  height: 100,
-  parent: '#svg',
-  orient: "bottom",
+  parent:'svg',
   id: 'yAxis'
 });
-var newOrient = {
-  name: '',
-  parent:'body',
-  tagName: 'input',
-  id: 'checkbox',
-  attr:{
-    type: "checkbox",
-    "checked": true
+let binding = {
+  font: axis.config().font
+}
+var data = [
+  {
+    text: 'Times New Roman - 12',
+    family: 'Times New Roman',
+    value: '12pt'
   },
-  event: {
-    name: 'onOrientChange',
+  {
+    text: 'Arial - 14',
+    family: 'Arial',
+    value: '20pt'
+  }
+]
+let config= {
+  event:{
+    name: 'onFontChange',
     type: 'change',
-    data: ()=>axis.config().orient==="left" ? "bottom": "left",
-    dispatch:(e)=>{
-      emitter.emit(config.event.name,config.event.data())
+    data:function(d,i){
+      var index = d3.event.target.selectedIndex;
+      binding;
+      var fontObj = data[index];
+
+      let newFont = {
+        font:{
+            'font-size': fontObj['value'],
+            'font-family': fontObj['family']
+          }
+      }
+      return newFont;
+    },
+    dispatch:(d,i)=>{
+      emitter.emit(config.event.name,config.event.data(d,i))
     }
   }
 }
-uiBind(newOrient);
-uiBind(config)
 
-//
+module.exports = dropdown;
 
-},{"../ChartEvents":1,"../axis/axis":2,"d3":11,"event-emitter":25,"underscore":26}],8:[function(require,module,exports){
+function dropdown(opts){
+  let select =  d3.select("body")
+    .append("select")
+    .attr("id","fontDropdown")
+    .on(config.event.type,config.event.dispatch);
+
+
+  dropdown.bindsTo = function(obj){
+    binding = obj;
+  }
+
+  let options = select.selectAll("option")
+    .data(opts.data)
+    .enter()
+      .append("option")
+      .text((d,i)=> d.text)
+      .attr("value",(d,i)=>d.value);
+
+  return dropdown;
+}
+
+dropdown({
+  data: data
+})
+
+},{"../ChartEvents":1,"../axis/axis":2,"d3":11,"underscore":26}],8:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';

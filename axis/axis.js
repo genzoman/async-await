@@ -36,7 +36,7 @@ let getDomain = ()=> {
 };
 
 let getConfig = (config,newOpts)=> _.extend(config,newOpts);
-let getTextElems = ()=> d3.select(config.id).selectAll("text");
+
 let getRange = ()=> [config.height,0];
 let getScale = ()=>{
   return config.orient==="left" ? linearScale() : ordinalScale();
@@ -65,6 +65,8 @@ window.axis;
 function axis(opts){
   config = getConfig(config,opts);
 
+  let getTextElems = ()=> d3.select('#'+config.id).selectAll("text");
+
   if(!d3.select('#'+config.id).size()){
     config.group = d3.select(config.parent)
       .append("g")
@@ -81,14 +83,14 @@ function axis(opts){
         .attr("transform",config.translate);
     else{
       axis.drag();
+      axis.font();
       return config.group.call(getAxis());
     }
 
   }
-  
-  axis.font = function(opt){
-    config = getConfig(opt);
-    dy = config.orient === "left" ? ".32em" : ".71em";
+
+  axis.font = function(){
+    let dy = config.orient === "left" ? ".32em" : ".71em";
     getTextElems().style({
       'font-size': config.font['font-size'],
       'font-family': config.font['font-family'],
@@ -115,6 +117,7 @@ function axis(opts){
     return axis;
   }
   axis.drag();
+
   return axis;
 }
 
