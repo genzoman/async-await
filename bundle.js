@@ -1,38 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
-//ChartEvents.js
-var ee = require("event-emitter");
-var emitter = ee({});
-var axis = require("./axis/axis");
-require("./rect/hide");
-
-emitter.on('onButtonClick',(time)=>{
-  console.log("the time when you click the button",time);
-});
-
-
-
-emitter.on('onFontChange',function(data){
-  axis(data);
-});
-emitter.on('onAxisToggle',function(data){
-  axis.toggle();
-});
-emitter.on('onDragChange',function(data){
-  axis({
-    hasDrag: data
-  });
-
-});
-emitter.on('onOrientChange',function(data){
-  axis({
-    orient: data
-  });
-});
-module.exports = emitter;
-
-},{"./axis/axis":2,"./rect/hide":6,"event-emitter":25}],2:[function(require,module,exports){
-'use strict';
 
 var d3 = require("d3");
 var Promise = require("bluebird");
@@ -58,10 +25,7 @@ var config = {
   hasDrag: true
 }
 
-d3.select("svg").attr({
-  height: 1000,
-  width:1000
-});
+
 
 let getOrdinalDomain = (data,key)=>config.data;
 let getLinearDomain = ()=>[0,d3.max(config.data)];
@@ -159,7 +123,7 @@ function axis(opts){
 
 module.exports = axis;
 
-},{"../behaviors/resize":4,"../utils/translate":8,"bluebird":9,"d3":11,"underscore":26}],3:[function(require,module,exports){
+},{"../behaviors/resize":3,"../utils/translate":7,"bluebird":8,"d3":9,"underscore":10}],2:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -207,7 +171,7 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
   }
 }
 
-},{"../utils/translate":8,"d3":11,"underscore":26}],4:[function(require,module,exports){
+},{"../utils/translate":7,"d3":9,"underscore":10}],3:[function(require,module,exports){
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
@@ -239,7 +203,104 @@ function shrink(axis,config){
 
 }
 
-},{"./horizontalResize":3,"./verticalResize":5,"d3":11}],5:[function(require,module,exports){
+},{"./horizontalResize":2,"./verticalResize":5,"d3":9}],4:[function(require,module,exports){
+const d3 = require("d3");
+const svg = d3.select("svg");
+const domAttrs = require("../dom/attrs");
+const axis = require("../axis/axis");
+var g = svg.append("g")
+
+window.d3 = d3;
+
+var rectConfig = {
+  height:50,
+  width:50,
+  y: 10,
+  x: 10
+}
+
+let getCoordsTop = (elem)=>{
+  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
+
+  return {
+      x1: elemAttrs.x -3 ,
+      y1: elemAttrs.y,
+      x2: rectConfig.width + rectConfig.x+3,
+      y2: elemAttrs.y,
+      id: "top"
+  }
+}
+let getCoordsRight = elem=>{
+  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
+  return {
+    x1: rectConfig.width + rectConfig.x+3,
+    x2: rectConfig.width + rectConfig.x+3,
+    y1: elemAttrs.y,
+    y2: elemAttrs.y+rectConfig.height,
+    id: "right"
+  }
+}
+
+let getCoordsBottom = elem =>{
+  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
+  return {
+    x1: rectConfig.x+3,
+    x2: rectConfig.width + rectConfig.x+3,
+    y1: elemAttrs.y+rectConfig.height,
+    y2: elemAttrs.y+rectConfig.height,
+    id: "bottom"
+  }
+}
+let getCoordsLeft = elem =>{
+  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
+  return {
+    x1: rectConfig.x+3,
+    x2: rectConfig.x +3,
+    y1: elemAttrs.y,
+    y2: elemAttrs.y+rectConfig.height,
+    id: "left"
+  }
+}
+
+
+var rect = d3.select("g").append("rect").attr(rectConfig);
+
+module.exports = surround;
+
+function surround(elem){
+  elem = elem.node ? elem.node() : elem
+  var coords = getCoordsTop(elem);
+  let line = d3.select("g")
+    .append("line")
+    .attr(coords)
+    .style("stroke","red")
+    .style("stroke-width",4);
+
+  let right = getCoordsRight(elem);
+  let rightLine = d3.select("g")
+    .append("line")
+    .attr(right)
+    .style("stroke","red")
+    .style("stroke-width",4);
+
+  let bottom = getCoordsBottom(elem);
+
+  let bottomLine = d3.select("g")
+    .append("line")
+    .attr(bottom)
+    .style("stroke","red")
+    .style("stroke-width",4);
+
+  let left = getCoordsLeft(elem);
+  let leftLine = d3.select("g")
+    .append("line")
+    .attr(left)
+    .style("stroke","red")
+    .style("stroke-width",4);
+}
+surround(d3.select("rect"));
+
+},{"../axis/axis":1,"../dom/attrs":6,"d3":9}],5:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -274,146 +335,120 @@ function verticalResize(opts){
 }
 module.exports = verticalResize;
 
-},{"../utils/translate":8,"d3":11}],6:[function(require,module,exports){
-var d3 = require("d3");
-var _ = require("underscore");
-let getConfig = (opts)=> _.extend(config_,opts);
-var rect = d3.select("rect");
-rect.insert("rect").attr({
-  x:100,
-  y:100,
-  fill: "blue"
-});
+},{"../utils/translate":7,"d3":9}],6:[function(require,module,exports){
+(function (global){
+'use strict';
+var d3 = require ("d3");
 
-setTimeout(function(){
-  hide('horizontal','leftRight');
-},2000);
-function hide(orient,dir){
-  if(orient==="vertical"){
-    if(dir==="bottomUp"){
-      return d3.select("rect").transition().duration(400).attrTween("height",function(){
-        var w = +d3.select(this).attr("height");
-        return d3.interpolateNumber(w--,0);
-      });
-    }
-    if(dir==="topDown"){
-      return d3.select("rect").transition().duration(400).attrTween("height",function(){
-        var w = +d3.select(this).attr("height");
-        return d3.interpolateNumber(w--,0);
-      }).attrTween("y",function(){
-        var y = +d3.select(this).attr("y");
-        var w = +d3.select(this).attr("width")
-        return d3.interpolateNumber(y,w/2);
-      });
-    }
-  }
-  else{
-    //
-    if(dir==="rightLeft"){
-      return d3.select("rect").transition().duration(400).attrTween("width",function(){
-        var w = +d3.select(this).attr("width");
-        return d3.interpolateNumber(w--,0);
-      });
-    }
-    if(dir==="leftRight"){
-      return d3.select("rect").transition().duration(400).attrTween("width",function(){
-        var w = +d3.select(this).attr("width");
-        return d3.interpolateNumber(w--,0);
-      }).attrTween("x",function(){
-        var x = +d3.select(this).attr("x");
-        var w = +d3.select(this).attr("width")
-        return d3.interpolateNumber(x,w/2);
-      });
-    }
+
+let getRectAttrs = (elem)=>{
+  if(!global || window){
+    console.log('asdf')
+    elem = d3.select(elem) || elem;
   }
 
-
-
-
+  var translate = elem.node ? d3.transform(elem.attr("transform")).translate
+                    : [0,0];
+  return {
+    x: +elem.attr("x"),
+    y: +elem.attr("y"),
+    width: +elem.attr("width"),
+    height: +elem.attr("height"),
+    translateX: translate[0],
+    translateY: translate[1],
+    absolutePosition:function(){
+      var x = this.x + this.translateX,
+        y = this.y + this.translateY
+      return [x,y];
+    }
+  }
 }
-
-},{"d3":11,"underscore":26}],7:[function(require,module,exports){
-const d3 = require("d3");
-const emitter =require("../ChartEvents");
-const axis = require("../axis/axis");
-const _ = require("underscore");
-
-axis({
-  parent:'svg',
-  id: 'yAxis'
-});
-let binding = {
-  font: axis.config().font
-}
-var data = [
-  {
-    text: 'Times New Roman - 12',
-    family: 'Times New Roman',
-    value: '12pt'
-  },
-  {
-    text: 'Arial - 14',
-    family: 'Arial',
-    value: '20pt'
-  }
-]
-let config= {
-  event:{
-    name: 'onFontChange',
-    type: 'change',
-    data:function(d,i){
-      var index = d3.event.target.selectedIndex;
-      binding;
-      var fontObj = data[index];
-
-      let newFont = {
-        font:{
-            'font-size': fontObj['value'],
-            'font-family': fontObj['family']
-          }
-      }
-      return newFont;
+let getCenter = (elem,middle)=>{
+  type = type || "topLeft";
+  var coords =[];
+  var pos = getAttrs(elem);
+  var fns = {
+    middle(){
+      x = pos.absolutePosition()[0] + (pos.width/2),
+      y = pos.absolutePosition()[1] + (pos.height/2);
+      return [x,y];
     },
-    dispatch:(d,i)=>{
-      emitter.emit(config.event.name,config.event.data(d,i))
+    topLeft(){
+      return [pos.x,pos.y];
+    },
+    topMiddle(){
+      return [pos.x + pos.width];
     }
   }
+  return fns[type]();
 }
 
-module.exports = dropdown;
-
-function dropdown(opts){
-  let select =  d3.select("body")
-    .append("select")
-    .attr("id","fontDropdown")
-    .on(config.event.type,config.event.dispatch);
-
-
-  dropdown.bindsTo = function(obj){
-    binding = obj;
+let getCircleAttrs  = (elem)=>{
+  console.log("al;sdfjl;kadsjfl;adjfl;kasd")
+  elem = elem.node ? elem.node() : elem;
+  var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0];
+  var attrs = {
+    x: +d3.select(elem).attr("cx"),
+    y: +d3.select(elem).attr("cy"),
+    cx: +d3.select(elem).attr("cx"),
+    cy: +d3.select(elem).attr("cy"),
+    width: +d3.select(elem).attr("r"),
+    r: +d3.select(elem).attr("r"),
+    height: +d3.select(elem).attr("r"),
+    translateX: translate[0],
+    translateY: translate[1],
+    absolutePosition:function(){
+      var x = this.x + this.translateX,
+        y = this.y + this.translateY
+      return [x,y];
+    },
+    fill:"blue"
   }
-
-  let options = select.selectAll("option")
-    .data(opts.data)
-    .enter()
-      .append("option")
-      .text((d,i)=> d.text)
-      .attr("value",(d,i)=>d.value);
-
-  return dropdown;
+  return attrs;
 }
 
-dropdown({
-  data: data
-})
+let getGroupAttrs = (elem)=>{
+  var box = elem.getBoundingClientRect();
+  console.log("asdf")
+  var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0]
+  return {
+    width: +box.width.toFixed(2),
+    height: box.height,
+    translateX: translate[0],
+    translateY: translate[1],
+    absolutePosition:function(){
+      return[box.width+ this.translateX,box.height + this.translateY];
+    }
 
-},{"../ChartEvents":1,"../axis/axis":2,"d3":11,"underscore":26}],8:[function(require,module,exports){
+  }
+}
+
+let getAttrs = (elem)=>{
+  console.log("getAttrs");
+  elem = elem.node ? elem.node() : elem;
+  switch(elem.tagName.toLowerCase()){
+    case 'rect':
+      return getRectAttrs(elem);
+      break;
+    case 'circle':
+      return getCircleAttrs(elem);
+      break;
+    case 'g':
+      return getGroupAttrs(elem);
+  }
+}
+module.exports = function(elem){
+  return getAttrs(elem);
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"d3":9}],7:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
 }
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -5871,72 +5906,7 @@ module.exports = ret;
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":27}],10:[function(require,module,exports){
-'use strict';
-
-var assign        = require('es5-ext/object/assign')
-  , normalizeOpts = require('es5-ext/object/normalize-options')
-  , isCallable    = require('es5-ext/object/is-callable')
-  , contains      = require('es5-ext/string/#/contains')
-
-  , d;
-
-d = module.exports = function (dscr, value/*, options*/) {
-	var c, e, w, options, desc;
-	if ((arguments.length < 2) || (typeof dscr !== 'string')) {
-		options = value;
-		value = dscr;
-		dscr = null;
-	} else {
-		options = arguments[2];
-	}
-	if (dscr == null) {
-		c = w = true;
-		e = false;
-	} else {
-		c = contains.call(dscr, 'c');
-		e = contains.call(dscr, 'e');
-		w = contains.call(dscr, 'w');
-	}
-
-	desc = { value: value, configurable: c, enumerable: e, writable: w };
-	return !options ? desc : assign(normalizeOpts(options), desc);
-};
-
-d.gs = function (dscr, get, set/*, options*/) {
-	var c, e, options, desc;
-	if (typeof dscr !== 'string') {
-		options = set;
-		set = get;
-		get = dscr;
-		dscr = null;
-	} else {
-		options = arguments[3];
-	}
-	if (get == null) {
-		get = undefined;
-	} else if (!isCallable(get)) {
-		options = get;
-		get = set = undefined;
-	} else if (set == null) {
-		set = undefined;
-	} else if (!isCallable(set)) {
-		options = set;
-		set = undefined;
-	}
-	if (dscr == null) {
-		c = true;
-		e = false;
-	} else {
-		c = contains.call(dscr, 'c');
-		e = contains.call(dscr, 'e');
-	}
-
-	desc = { get: get, set: set, configurable: c, enumerable: e };
-	return !options ? desc : assign(normalizeOpts(options), desc);
-};
-
-},{"es5-ext/object/assign":12,"es5-ext/object/is-callable":15,"es5-ext/object/normalize-options":19,"es5-ext/string/#/contains":22}],11:[function(require,module,exports){
+},{"_process":11}],9:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -15491,277 +15461,7 @@ d.gs = function (dscr, get, set/*, options*/) {
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],12:[function(require,module,exports){
-'use strict';
-
-module.exports = require('./is-implemented')()
-	? Object.assign
-	: require('./shim');
-
-},{"./is-implemented":13,"./shim":14}],13:[function(require,module,exports){
-'use strict';
-
-module.exports = function () {
-	var assign = Object.assign, obj;
-	if (typeof assign !== 'function') return false;
-	obj = { foo: 'raz' };
-	assign(obj, { bar: 'dwa' }, { trzy: 'trzy' });
-	return (obj.foo + obj.bar + obj.trzy) === 'razdwatrzy';
-};
-
-},{}],14:[function(require,module,exports){
-'use strict';
-
-var keys  = require('../keys')
-  , value = require('../valid-value')
-
-  , max = Math.max;
-
-module.exports = function (dest, src/*, …srcn*/) {
-	var error, i, l = max(arguments.length, 2), assign;
-	dest = Object(value(dest));
-	assign = function (key) {
-		try { dest[key] = src[key]; } catch (e) {
-			if (!error) error = e;
-		}
-	};
-	for (i = 1; i < l; ++i) {
-		src = arguments[i];
-		keys(src).forEach(assign);
-	}
-	if (error !== undefined) throw error;
-	return dest;
-};
-
-},{"../keys":16,"../valid-value":21}],15:[function(require,module,exports){
-// Deprecated
-
-'use strict';
-
-module.exports = function (obj) { return typeof obj === 'function'; };
-
-},{}],16:[function(require,module,exports){
-'use strict';
-
-module.exports = require('./is-implemented')()
-	? Object.keys
-	: require('./shim');
-
-},{"./is-implemented":17,"./shim":18}],17:[function(require,module,exports){
-'use strict';
-
-module.exports = function () {
-	try {
-		Object.keys('primitive');
-		return true;
-	} catch (e) { return false; }
-};
-
-},{}],18:[function(require,module,exports){
-'use strict';
-
-var keys = Object.keys;
-
-module.exports = function (object) {
-	return keys(object == null ? object : Object(object));
-};
-
-},{}],19:[function(require,module,exports){
-'use strict';
-
-var forEach = Array.prototype.forEach, create = Object.create;
-
-var process = function (src, obj) {
-	var key;
-	for (key in src) obj[key] = src[key];
-};
-
-module.exports = function (options/*, …options*/) {
-	var result = create(null);
-	forEach.call(arguments, function (options) {
-		if (options == null) return;
-		process(Object(options), result);
-	});
-	return result;
-};
-
-},{}],20:[function(require,module,exports){
-'use strict';
-
-module.exports = function (fn) {
-	if (typeof fn !== 'function') throw new TypeError(fn + " is not a function");
-	return fn;
-};
-
-},{}],21:[function(require,module,exports){
-'use strict';
-
-module.exports = function (value) {
-	if (value == null) throw new TypeError("Cannot use null or undefined");
-	return value;
-};
-
-},{}],22:[function(require,module,exports){
-'use strict';
-
-module.exports = require('./is-implemented')()
-	? String.prototype.contains
-	: require('./shim');
-
-},{"./is-implemented":23,"./shim":24}],23:[function(require,module,exports){
-'use strict';
-
-var str = 'razdwatrzy';
-
-module.exports = function () {
-	if (typeof str.contains !== 'function') return false;
-	return ((str.contains('dwa') === true) && (str.contains('foo') === false));
-};
-
-},{}],24:[function(require,module,exports){
-'use strict';
-
-var indexOf = String.prototype.indexOf;
-
-module.exports = function (searchString/*, position*/) {
-	return indexOf.call(this, searchString, arguments[1]) > -1;
-};
-
-},{}],25:[function(require,module,exports){
-'use strict';
-
-var d        = require('d')
-  , callable = require('es5-ext/object/valid-callable')
-
-  , apply = Function.prototype.apply, call = Function.prototype.call
-  , create = Object.create, defineProperty = Object.defineProperty
-  , defineProperties = Object.defineProperties
-  , hasOwnProperty = Object.prototype.hasOwnProperty
-  , descriptor = { configurable: true, enumerable: false, writable: true }
-
-  , on, once, off, emit, methods, descriptors, base;
-
-on = function (type, listener) {
-	var data;
-
-	callable(listener);
-
-	if (!hasOwnProperty.call(this, '__ee__')) {
-		data = descriptor.value = create(null);
-		defineProperty(this, '__ee__', descriptor);
-		descriptor.value = null;
-	} else {
-		data = this.__ee__;
-	}
-	if (!data[type]) data[type] = listener;
-	else if (typeof data[type] === 'object') data[type].push(listener);
-	else data[type] = [data[type], listener];
-
-	return this;
-};
-
-once = function (type, listener) {
-	var once, self;
-
-	callable(listener);
-	self = this;
-	on.call(this, type, once = function () {
-		off.call(self, type, once);
-		apply.call(listener, this, arguments);
-	});
-
-	once.__eeOnceListener__ = listener;
-	return this;
-};
-
-off = function (type, listener) {
-	var data, listeners, candidate, i;
-
-	callable(listener);
-
-	if (!hasOwnProperty.call(this, '__ee__')) return this;
-	data = this.__ee__;
-	if (!data[type]) return this;
-	listeners = data[type];
-
-	if (typeof listeners === 'object') {
-		for (i = 0; (candidate = listeners[i]); ++i) {
-			if ((candidate === listener) ||
-					(candidate.__eeOnceListener__ === listener)) {
-				if (listeners.length === 2) data[type] = listeners[i ? 0 : 1];
-				else listeners.splice(i, 1);
-			}
-		}
-	} else {
-		if ((listeners === listener) ||
-				(listeners.__eeOnceListener__ === listener)) {
-			delete data[type];
-		}
-	}
-
-	return this;
-};
-
-emit = function (type) {
-	var i, l, listener, listeners, args;
-
-	if (!hasOwnProperty.call(this, '__ee__')) return;
-	listeners = this.__ee__[type];
-	if (!listeners) return;
-
-	if (typeof listeners === 'object') {
-		l = arguments.length;
-		args = new Array(l - 1);
-		for (i = 1; i < l; ++i) args[i - 1] = arguments[i];
-
-		listeners = listeners.slice();
-		for (i = 0; (listener = listeners[i]); ++i) {
-			apply.call(listener, this, args);
-		}
-	} else {
-		switch (arguments.length) {
-		case 1:
-			call.call(listeners, this);
-			break;
-		case 2:
-			call.call(listeners, this, arguments[1]);
-			break;
-		case 3:
-			call.call(listeners, this, arguments[1], arguments[2]);
-			break;
-		default:
-			l = arguments.length;
-			args = new Array(l - 1);
-			for (i = 1; i < l; ++i) {
-				args[i - 1] = arguments[i];
-			}
-			apply.call(listeners, this, args);
-		}
-	}
-};
-
-methods = {
-	on: on,
-	once: once,
-	off: off,
-	emit: emit
-};
-
-descriptors = {
-	on: d(on),
-	once: d(once),
-	off: d(off),
-	emit: d(emit)
-};
-
-base = defineProperties({}, descriptors);
-
-module.exports = exports = function (o) {
-	return (o == null) ? create(base) : defineProperties(Object(o), descriptors);
-};
-exports.methods = methods;
-
-},{"d":10,"es5-ext/object/valid-callable":20}],26:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -17311,7 +17011,7 @@ exports.methods = methods;
   }
 }.call(this));
 
-},{}],27:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -17404,4 +17104,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[7]);
+},{}]},{},[4]);

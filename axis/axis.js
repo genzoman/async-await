@@ -24,10 +24,7 @@ var config = {
   hasDrag: true
 }
 
-d3.select("svg").attr({
-  height: 1000,
-  width:1000
-});
+
 
 let getOrdinalDomain = (data,key)=>config.data;
 let getLinearDomain = ()=>[0,d3.max(config.data)];

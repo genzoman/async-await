@@ -3,7 +3,6 @@ var d3 = require ("d3");
 
 
 let getRectAttrs = (elem)=>{
-  console.log("RECT ATTRS")
   if(!global || window){
     console.log('asdf')
     elem = d3.select(elem) || elem;
