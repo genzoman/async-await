@@ -219,78 +219,37 @@ var rectConfig = {
   x: 10
 }
 
-let getCoordsTop = (elem)=>{
-  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
 
-  return {
-      x1: elemAttrs.x -3 ,
-      y1: elemAttrs.y,
-      x2: rectConfig.width + rectConfig.x+3,
-      y2: elemAttrs.y,
-      id: "top"
-  }
-}
-let getCoordsRight = elem=>{
-  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
-  return {
-    x1: rectConfig.width + rectConfig.x+3,
-    x2: rectConfig.width + rectConfig.x+3,
-    y1: elemAttrs.y,
-    y2: elemAttrs.y+rectConfig.height,
-    id: "right"
-  }
-}
 
-let getCoordsBottom = elem =>{
-  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
-  return {
-    x1: rectConfig.x+3,
-    x2: rectConfig.width + rectConfig.x+3,
-    y1: elemAttrs.y+rectConfig.height,
-    y2: elemAttrs.y+rectConfig.height,
-    id: "bottom"
-  }
-}
-let getCoordsLeft = elem =>{
-  let elemAttrs = domAttrs(elem.node ? elem.node() :elem);
-  return {
-    x1: rectConfig.x+3,
-    x2: rectConfig.x +3,
-    y1: elemAttrs.y,
-    y2: elemAttrs.y+rectConfig.height,
-    id: "left"
-  }
-}
-
-let getSurroundLineData = el =>{
+let getSurroundLineData = (el,w) =>{
   let elemAttrs = domAttrs(el.node ? el.node() :el);
   return [
     {
-      x1: elemAttrs.x -3 ,
+      x1: elemAttrs.x-w/2 ,
       y1: elemAttrs.y,
-      x2: rectConfig.width + rectConfig.x+3,
+      x2: rectConfig.width + rectConfig.x + w/2,
       y2: elemAttrs.y,
       id: "top"
     },
     {
-      x1: rectConfig.width + rectConfig.x+3,
-      x2: rectConfig.width + rectConfig.x+3,
+      x1: rectConfig.width + rectConfig.x,
+      x2: rectConfig.width + rectConfig.x,
       y1: elemAttrs.y,
-      y2: elemAttrs.y+rectConfig.height,
+      y2: elemAttrs.y+rectConfig.height + w/2,
       id: "right"
     },
     {
-      x1: rectConfig.x+3,
-      x2: rectConfig.width + rectConfig.x+3,
+      x1: rectConfig.x,
+      x2: rectConfig.width + rectConfig.x,
       y1: elemAttrs.y+rectConfig.height,
       y2: elemAttrs.y+rectConfig.height,
       id: "bottom"
     },
     {
-      x1: rectConfig.x+3,
-      x2: rectConfig.x +3,
+      x1: rectConfig.x,
+      x2: rectConfig.x,
       y1: elemAttrs.y,
-      y2: elemAttrs.y+rectConfig.height,
+      y2: elemAttrs.y+rectConfig.height + w/2,
       id: "left"
     }
   ]
@@ -302,7 +261,7 @@ module.exports = surround;
 function surround(elem){
   elem = elem.node ? elem.node() : elem
   var lines = d3.select("g").selectAll(".lines")
-    .data(getSurroundLineData(elem))
+    .data(getSurroundLineData(elem,4))
     .enter()
       .append("line")
       .attr({
@@ -318,8 +277,10 @@ function surround(elem){
         y2:function(d,i){
           return d.y2;
         },
-        stroke: "blue"
-      });
+        stroke: "orange",
+        "stroke-width": 4
+      })
+
 
 }
 surround(d3.select("rect"));
