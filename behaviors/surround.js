@@ -56,40 +56,64 @@ let getCoordsLeft = elem =>{
   }
 }
 
-
+let getSurroundLineData = el =>{
+  let elemAttrs = domAttrs(el.node ? el.node() :el);
+  return [
+    {
+      x1: elemAttrs.x -3 ,
+      y1: elemAttrs.y,
+      x2: rectConfig.width + rectConfig.x+3,
+      y2: elemAttrs.y,
+      id: "top"
+    },
+    {
+      x1: rectConfig.width + rectConfig.x+3,
+      x2: rectConfig.width + rectConfig.x+3,
+      y1: elemAttrs.y,
+      y2: elemAttrs.y+rectConfig.height,
+      id: "right"
+    },
+    {
+      x1: rectConfig.x+3,
+      x2: rectConfig.width + rectConfig.x+3,
+      y1: elemAttrs.y+rectConfig.height,
+      y2: elemAttrs.y+rectConfig.height,
+      id: "bottom"
+    },
+    {
+      x1: rectConfig.x+3,
+      x2: rectConfig.x +3,
+      y1: elemAttrs.y,
+      y2: elemAttrs.y+rectConfig.height,
+      id: "left"
+    }
+  ]
+}
 var rect = d3.select("g").append("rect").attr(rectConfig);
 
 module.exports = surround;
 
 function surround(elem){
   elem = elem.node ? elem.node() : elem
-  var coords = getCoordsTop(elem);
-  let line = d3.select("g")
-    .append("line")
-    .attr(coords)
-    .style("stroke","red")
-    .style("stroke-width",4);
+  var lines = d3.select("g").selectAll(".lines")
+    .data(getSurroundLineData(elem))
+    .enter()
+      .append("line")
+      .attr({
+        x1:function(d,i){
+          return d.x1;
+        },
+        x2:function(d,i){
+          return d.x2;
+        },
+        y1:function(d,i){
+          return d.y1;
+        },
+        y2:function(d,i){
+          return d.y2;
+        },
+        stroke: "blue"
+      });
 
-  let right = getCoordsRight(elem);
-  let rightLine = d3.select("g")
-    .append("line")
-    .attr(right)
-    .style("stroke","red")
-    .style("stroke-width",4);
-
-  let bottom = getCoordsBottom(elem);
-
-  let bottomLine = d3.select("g")
-    .append("line")
-    .attr(bottom)
-    .style("stroke","red")
-    .style("stroke-width",4);
-
-  let left = getCoordsLeft(elem);
-  let leftLine = d3.select("g")
-    .append("line")
-    .attr(left)
-    .style("stroke","red")
-    .style("stroke-width",4);
 }
 surround(d3.select("rect"));
