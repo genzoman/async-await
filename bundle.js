@@ -12,6 +12,16 @@ let path = svg.append("path")
   .style("stroke","blue")
   .attr("fill","none");
 
+  var totalLength = path.node().getTotalLength();
+
+     path
+       .attr("stroke-dasharray", totalLength + " " + totalLength)
+       .attr("stroke-dashoffset", totalLength)
+       .transition()
+         .duration(2000)
+         .ease("linear")
+         .attr("stroke-dashoffset", 0);
+
 },{"d3":2}],2:[function(require,module,exports){
 !function() {
   var d3 = {
