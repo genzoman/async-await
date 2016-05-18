@@ -62,8 +62,9 @@ function dropdown(opts){
     .data(opts.data)
     .enter()
       .append("option")
-      .text((d,i)=> d.text)
-      .attr("value",(d,i)=>d.value);
+      .text(d=> d.text)
+      .attr("value",d=>d.value);
+
 
   return dropdown;
 }
