@@ -4,7 +4,6 @@ var d3 = require ("d3");
 
 let getRectAttrs = (elem)=>{
   if(!global || window){
-    console.log('asdf')
     elem = d3.select(elem) || elem;
   }
 
@@ -45,7 +44,7 @@ let getCenter = (elem,middle)=>{
 }
 
 let getCircleAttrs  = (elem)=>{
-  console.log("al;sdfjl;kadsjfl;adjfl;kasd")
+
   elem = elem.node ? elem.node() : elem;
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0];
   var attrs = {
@@ -70,7 +69,6 @@ let getCircleAttrs  = (elem)=>{
 
 let getGroupAttrs = (elem)=>{
   var box = elem.getBoundingClientRect();
-  console.log("asdf")
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0]
   return {
     width: +box.width.toFixed(2),
@@ -85,7 +83,6 @@ let getGroupAttrs = (elem)=>{
 }
 
 let getAttrs = (elem)=>{
-  console.log("getAttrs");
   elem = elem.node ? elem.node() : elem;
   switch(elem.tagName.toLowerCase()){
     case 'rect':
@@ -96,6 +93,20 @@ let getAttrs = (elem)=>{
       break;
     case 'g':
       return getGroupAttrs(elem);
+    case 'line':
+      return getLineAttrs(elem);
+  }
+}
+let getLineAttrs = elem=>{
+  return {
+      x1: +d3.select(elem).attr("x1"),
+      x2: +d3.select(elem).attr("x2"),
+      y1: +d3.select(elem).attr("y1"),
+      y2: +d3.select(elem).attr("y2"),
+      strokeWidth: +d3.select(elem).attr("stroke-width"),
+      stroke: d3.select(elem).attr("stroke"),
+      fill: d3.select(elem).attr("fill"),
+      id: d3.select(elem).attr("fill")
   }
 }
 module.exports = function(elem){
