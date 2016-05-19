@@ -123,7 +123,42 @@ function axis(opts){
 
 module.exports = axis;
 
-},{"../behaviors/resize":3,"../utils/translate":8,"bluebird":9,"d3":10,"underscore":11}],2:[function(require,module,exports){
+},{"../behaviors/resize":4,"../utils/translate":10,"bluebird":11,"d3":12,"underscore":13}],2:[function(require,module,exports){
+var d3 = require("d3");
+var domAttrs = require("../dom/attrs");
+
+(function() {
+  'use strict';
+  d3.transition.prototype.fancyBorder = function(){
+
+    var attr =  {
+      x1: function(){
+        let line = domAttrs(this);
+        switch(line.id){
+          case "top":
+            return d3.interpolateNumber(line.x2,line.x1);
+          case "bottom":
+            return d3.interpolateNumber(line.x2,line.x1);
+
+        }
+      },
+      y2: function(){
+        let line = domAttrs(this);
+        switch(line.id){
+          case "left":
+            return d3.interpolateNumber(line.y1,line.y2);
+        case "right":
+            return d3.interpolateNumber(line.y1,line.y2);
+        }
+      }
+    }
+    for(let prop in attr)
+      this.attrTween(prop,attr[prop]);
+  }
+  return this;
+}());
+
+},{"../dom/attrs":7,"d3":12}],3:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -171,7 +206,7 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
   }
 }
 
-},{"../utils/translate":8,"d3":10,"underscore":11}],3:[function(require,module,exports){
+},{"../utils/translate":10,"d3":12,"underscore":13}],4:[function(require,module,exports){
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
@@ -203,23 +238,25 @@ function shrink(axis,config){
 
 }
 
-},{"./horizontalResize":2,"./verticalResize":5,"d3":10}],4:[function(require,module,exports){
+},{"./horizontalResize":3,"./verticalResize":6,"d3":12}],5:[function(require,module,exports){
 const d3 = require("d3");
 const svg = d3.select("svg");
 const domAttrs = require("../dom/attrs");
 const axis = require("../axis/axis");
 const circlePath = require("../paths/circle-path");
-
+const drawIn = require("../paths/animations/drawIn");
+require("../behaviors/fancyBorder");
 var g = svg.append("g")
 
 window.d3 = d3;
 
 var rectConfig = {
-  height:125,
-  width:50,
+  height:60,
+  width:20,
   y: 10,
   x: 10
 }
+
 
 
 
@@ -256,57 +293,70 @@ let getSurroundLineData = (el,w) =>{
     }
   ]
 }
-d3.select("svg").append("circle")
-  .attr({
-    cx: 50,
-    cy: 50,
-    r: 15
-  });
+
 
 module.exports = surround;
 
 function surround(elem){
-  elem.each(function(d,i){
-    if(this.tagName.toLowerCase()==="circle"){
+  var surroundAttrs = {
+    circle: function(){
       var attrs = domAttrs(this);
-      d3.select("g").append("path")
-        .attr("d",circlePath(attrs.x,attrs.y,attrs.r + 4))
-          .attr("stroke","blue")
-          .attr("stroke-width",5)
-          .attr("fill","none");
-        return;
+      var path = d3.select("g").append("path")
+          .attr("d",circlePath(attrs.x,attrs.y,attrs.r + 4))
+            .attr("stroke","blue")
+            .attr("stroke-width",5)
+            .attr("fill","none");
+    },
+    rect:function(){
+      d3.select("g").selectAll(".lines")
+        .data(getSurroundLineData(this,4))
+        .enter()
+          .append("line")
+          .attr({
+            x1:function(d,i){
+              return d.x1;
+            },
+            x2:function(d,i){
+              return d.x2;
+            },
+            y1:function(d,i){
+              return d.y1;
+            },
+            y2:function(d,i){
+              return d.y2;
+            },
+            id: d=>d.id,
+            stroke: "orange",
+            "stroke-width": 4
+          });
     }
-    var elem = getSurroundLineData(this,4);
+  }
+  elem.each(function(d,i){
+    var tag = this.tagName;
+    return surroundAttrs[tag].call(this);;
+    //var elem = getSurroundLineData(this,4);
 
-
-
-    d3.select("g").selectAll(".lines")
-      .data(getSurroundLineData(this,4))
-      .enter()
-        .append("line")
-        .attr({
-          x1:function(d,i){
-            return d.x1;
-          },
-          x2:function(d,i){
-            return d.x2;
-          },
-          y1:function(d,i){
-            return d.y1;
-          },
-          y2:function(d,i){
-            return d.y2;
-          },
-          id: d=>d.id,
-          stroke: "orange",
-          "stroke-width": 4
-        });
   });
 
 }
-surround(d3.select("circle"));
 
-},{"../axis/axis":1,"../dom/attrs":6,"../paths/circle-path":7,"d3":10}],5:[function(require,module,exports){
+g.append("rect").attr({
+  x:50,
+  y:50,
+  width:30,
+  height:60
+});
+
+surround(d3.selectAll("rect"));
+
+
+
+d3.selectAll("line")
+  .transition()
+  .duration(300)
+  .fancyBorder()
+
+},{"../axis/axis":1,"../behaviors/fancyBorder":2,"../dom/attrs":7,"../paths/animations/drawIn":8,"../paths/circle-path":9,"d3":12}],6:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
 var translate = require("../utils/translate");
@@ -341,7 +391,7 @@ function verticalResize(opts){
 }
 module.exports = verticalResize;
 
-},{"../utils/translate":8,"d3":10}],6:[function(require,module,exports){
+},{"../utils/translate":10,"d3":12}],7:[function(require,module,exports){
 (function (global){
 'use strict';
 var d3 = require ("d3");
@@ -349,7 +399,6 @@ var d3 = require ("d3");
 
 let getRectAttrs = (elem)=>{
   if(!global || window){
-    console.log('asdf')
     elem = d3.select(elem) || elem;
   }
 
@@ -390,7 +439,7 @@ let getCenter = (elem,middle)=>{
 }
 
 let getCircleAttrs  = (elem)=>{
-  console.log("al;sdfjl;kadsjfl;adjfl;kasd")
+
   elem = elem.node ? elem.node() : elem;
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0];
   var attrs = {
@@ -415,7 +464,6 @@ let getCircleAttrs  = (elem)=>{
 
 let getGroupAttrs = (elem)=>{
   var box = elem.getBoundingClientRect();
-  console.log("asdf")
   var translate = d3.transform(d3.select(elem).attr("transform")).translate || [0,0]
   return {
     width: +box.width.toFixed(2),
@@ -430,7 +478,6 @@ let getGroupAttrs = (elem)=>{
 }
 
 let getAttrs = (elem)=>{
-  console.log("getAttrs");
   elem = elem.node ? elem.node() : elem;
   switch(elem.tagName.toLowerCase()){
     case 'rect':
@@ -441,6 +488,20 @@ let getAttrs = (elem)=>{
       break;
     case 'g':
       return getGroupAttrs(elem);
+    case 'line':
+      return getLineAttrs(elem);
+  }
+}
+let getLineAttrs = elem=>{
+  return {
+      x1: +d3.select(elem).attr("x1"),
+      x2: +d3.select(elem).attr("x2"),
+      y1: +d3.select(elem).attr("y1"),
+      y2: +d3.select(elem).attr("y2"),
+      strokeWidth: +d3.select(elem).attr("stroke-width"),
+      stroke: d3.select(elem).attr("stroke"),
+      fill: d3.select(elem).attr("fill"),
+      id: d3.select(elem).attr("id")
   }
 }
 module.exports = function(elem){
@@ -448,7 +509,21 @@ module.exports = function(elem){
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"d3":10}],7:[function(require,module,exports){
+},{"d3":12}],8:[function(require,module,exports){
+var d3 = require("d3");
+module.exports = function(path){
+  var totalLength = path.node().getTotalLength();
+  path
+    .attr("stroke-dasharray", totalLength+ " " + totalLength)
+    .attr("stroke-dashoffset", totalLength)
+    .transition()
+      .duration(600)
+      .ease("bounce")
+      .attr("stroke-dashoffset", 0);
+
+}
+
+},{"d3":12}],9:[function(require,module,exports){
 var d3 = require("d3");
 
 
@@ -457,13 +532,13 @@ function circlePath(cx, cy, r){
 }
 module.exports = circlePath;
 
-},{"d3":10}],8:[function(require,module,exports){
+},{"d3":12}],10:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';
 }
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -5921,7 +5996,7 @@ module.exports = ret;
 },{"./es5":13}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":12}],10:[function(require,module,exports){
+},{"_process":14}],12:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.16"
@@ -15476,7 +15551,7 @@ module.exports = ret;
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -17026,7 +17101,7 @@ module.exports = ret;
   }
 }.call(this));
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -17119,4 +17194,4 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[4]);
+},{}]},{},[5]);

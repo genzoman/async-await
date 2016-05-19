@@ -6,7 +6,7 @@ var axis = require("./axis/axis");
 require("./rect/hide");
 
 emitter.on('onButtonClick',(time)=>{
-  console.log("the time when you click the button",time);
+  
 });
 
 

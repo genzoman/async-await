@@ -3,17 +3,19 @@ const svg = d3.select("svg");
 const domAttrs = require("../dom/attrs");
 const axis = require("../axis/axis");
 const circlePath = require("../paths/circle-path");
-
+const drawIn = require("../paths/animations/drawIn");
+require("../behaviors/fancyBorder");
 var g = svg.append("g")
 
 window.d3 = d3;
 
 var rectConfig = {
-  height:125,
-  width:50,
+  height:60,
+  width:20,
   y: 10,
   x: 10
 }
+
 
 
 
@@ -50,52 +52,65 @@ let getSurroundLineData = (el,w) =>{
     }
   ]
 }
-d3.select("svg").append("circle")
-  .attr({
-    cx: 50,
-    cy: 50,
-    r: 15
-  });
+
 
 module.exports = surround;
 
 function surround(elem){
-  elem.each(function(d,i){
-    if(this.tagName.toLowerCase()==="circle"){
+  var surroundAttrs = {
+    circle: function(){
       var attrs = domAttrs(this);
-      d3.select("g").append("path")
-        .attr("d",circlePath(attrs.x,attrs.y,attrs.r + 4))
-          .attr("stroke","blue")
-          .attr("stroke-width",5)
-          .attr("fill","none");
-        return;
+      var path = d3.select("g").append("path")
+          .attr("d",circlePath(attrs.x,attrs.y,attrs.r + 4))
+            .attr("stroke","blue")
+            .attr("stroke-width",5)
+            .attr("fill","none");
+    },
+    rect:function(){
+      d3.select("g").selectAll(".lines")
+        .data(getSurroundLineData(this,4))
+        .enter()
+          .append("line")
+          .attr({
+            x1:function(d,i){
+              return d.x1;
+            },
+            x2:function(d,i){
+              return d.x2;
+            },
+            y1:function(d,i){
+              return d.y1;
+            },
+            y2:function(d,i){
+              return d.y2;
+            },
+            id: d=>d.id,
+            stroke: "orange",
+            "stroke-width": 4
+          });
     }
-    var elem = getSurroundLineData(this,4);
+  }
+  elem.each(function(d,i){
+    var tag = this.tagName;
+    return surroundAttrs[tag].call(this);;
+    //var elem = getSurroundLineData(this,4);
 
-
-
-    d3.select("g").selectAll(".lines")
-      .data(getSurroundLineData(this,4))
-      .enter()
-        .append("line")
-        .attr({
-          x1:function(d,i){
-            return d.x1;
-          },
-          x2:function(d,i){
-            return d.x2;
-          },
-          y1:function(d,i){
-            return d.y1;
-          },
-          y2:function(d,i){
-            return d.y2;
-          },
-          id: d=>d.id,
-          stroke: "orange",
-          "stroke-width": 4
-        });
   });
 
 }
-surround(d3.select("circle"));
+
+g.append("rect").attr({
+  x:50,
+  y:50,
+  width:30,
+  height:60
+});
+
+surround(d3.selectAll("rect"));
+
+
+
+d3.selectAll("line")
+  .transition()
+  .duration(300)
+  .fancyBorder()
