@@ -2,6 +2,8 @@ const d3 = require("d3");
 const svg = d3.select("svg");
 const domAttrs = require("../dom/attrs");
 const axis = require("../axis/axis");
+const circlePath = require("../paths/circle-path");
+
 var g = svg.append("g")
 
 window.d3 = d3;
@@ -12,14 +14,9 @@ var rectConfig = {
   y: 10,
   x: 10
 }
-d3.select("svg").append("rect").attr({
-  height: 40,
-  width:50,
-  y: 60,
-  x: 80
-})
 
-d3.select("svg").append("rect").attr(rectConfig);
+
+
 let getSurroundLineData = (el,w) =>{
   let elemAttrs = domAttrs(el.node ? el.node() :el);
   return [
@@ -53,14 +50,30 @@ let getSurroundLineData = (el,w) =>{
     }
   ]
 }
-
+d3.select("svg").append("circle")
+  .attr({
+    cx: 50,
+    cy: 50,
+    r: 15
+  });
 
 module.exports = surround;
 
 function surround(elem){
   elem.each(function(d,i){
-
+    if(this.tagName.toLowerCase()==="circle"){
+      var attrs = domAttrs(this);
+      d3.select("g").append("path")
+        .attr("d",circlePath(attrs.x,attrs.y,attrs.r + 4))
+          .attr("stroke","blue")
+          .attr("stroke-width",5)
+          .attr("fill","none");
+        return;
+    }
     var elem = getSurroundLineData(this,4);
+
+
+
     d3.select("g").selectAll(".lines")
       .data(getSurroundLineData(this,4))
       .enter()
@@ -85,4 +98,4 @@ function surround(elem){
   });
 
 }
-d3.selectAll("rect").call(surround);
+surround(d3.select("circle"));

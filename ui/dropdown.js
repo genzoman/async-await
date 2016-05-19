@@ -71,4 +71,4 @@ function dropdown(opts){
 
 dropdown({
   data: data
-})
+});
