@@ -106,7 +106,7 @@ let getLineAttrs = elem=>{
       strokeWidth: +d3.select(elem).attr("stroke-width"),
       stroke: d3.select(elem).attr("stroke"),
       fill: d3.select(elem).attr("fill"),
-      id: d3.select(elem).attr("fill")
+      id: d3.select(elem).attr("id")
   }
 }
 module.exports = function(elem){
