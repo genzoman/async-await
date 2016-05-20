@@ -10,4 +10,3 @@ var d3 = require("d3");
 
   }
 }());
-svg.for("rect",data).attr(checkerboard())

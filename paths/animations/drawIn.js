@@ -7,11 +7,14 @@ var circlePath = require("../../paths/circle-path");
     let elem = this.node();
     var totalLength = elem.getTotalLength();
     return d3.select(elem)
-        .attr("stroke-dasharray", totalLength+ " " + totalLength)
+        .attr("stroke-dasharray",()=>{
+          console.log(this)
+          return totalLength+ " " + totalLength;
+        })
         .attr("stroke-dashoffset", totalLength)
         .transition()
-          .duration(600)
-          .ease("bounce")
+          .duration(450)
+          .ease("cubic")
           .attr("stroke-dashoffset", 0);
   }
 }());

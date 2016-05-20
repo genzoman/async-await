@@ -26,8 +26,9 @@ var domAttrs = require("../dom/attrs");
         }
       }
     }
-    for(let prop in attr)
-      this.attrTween(prop,attr[prop]);
+    for(let prop in attr) this.attrTween(prop,attr[prop]);
+
+    return this;
   }
-  return this;
+
 }());
