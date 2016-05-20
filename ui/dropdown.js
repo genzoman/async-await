@@ -7,6 +7,7 @@ axis({
   parent:'svg',
   id: 'yAxis'
 });
+
 let binding = {
   font: axis.config().font
 }
