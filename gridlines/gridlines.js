@@ -21,25 +21,45 @@ let horizontalGridline = (attrs,n)=>{
     y2: attrs.y + n * vertSpace
   }
 }
-//
-
+//this is the data we need to bind to the horizontal gridlines
+//there is an ugly issue of binding the data, but then have to
+//use the paradigm .attr({x1: d=>d.x1}) kind of thing
+//i wish the bound data could do that for us
 var horzGridlineCoords = d3.range(0,numLines,1)
   .map((e,i)=>{
     return horizontalGridline(elemAttrs,i);
   });
-var lines = svg.selectAll("line")
-    .data(horzGridlineCoords)
+//VERTICAL
+let verticalGridLine = (attrs,n)=>{
+  return {
+    x1: attrs.x  + n * horzSpace,
+    x2: attrs.x  + n * horzSpace,
+    "stroke-width": 4,
+    "fill": "none",
+    "stroke": "blue",
+    y1: attrs.y,
+    y2: attrs.y + attrs.height
+  }
+}
+
+var vertGridlineCoords = d3.range(0,numLines,1)
+  .map((e,i)=>{
+    return verticalGridLine(elemAttrs,i);
+  });
+
+  svg.selectAll("line")
+    .data(vertGridlineCoords)
     .enter()
     .append("line")
     .attr({
-      x1:(d,i)=> d.x1,
-      x2:(d,i)=> d.x2,
-      y1:(d,i)=> d.y1,
-      y2:(d,i)=> d.y2,
-      "stroke-width":4,
+      x1:d=>d.x1,
+      x2:d=>d.x2,
+      y1:d=>d.y1,
+      y2:d=>d.y2,
+      "stroke-width":d=>d['stroke-width'],
       "fill":"none",
-      "stroke":"blue"
-    })
+      "stroke":d=>d['stroke']
+    });
   return gridlines;
 }
 
