@@ -31,9 +31,26 @@ var config = {
 }
 
 
+let isGroupedData = (data)=>{
+  return Array.isArray(data[0]);
+}
 
-let getOrdinalDomain = (data,key)=>config.data;
-let getLinearDomain = ()=>[0,d3.max(config.data)];
+let getOrdinalDomain = (data,key)=>{
+  if(isGroupedData(config.data)){
+    return config.data[0];  
+  }  
+}
+
+let getLinearDomain = ()=>{
+  if(isGroupedData(config.data)){
+    return [0,d3.max(config.data[0])];  
+  }
+  else{
+    return [0,d3.max(config.data)];
+  }
+    
+}
+
 let getDomain = ()=> {
   return config.orient==="left" ? getLinearDomain() : getOrdinalDomain();
 };
@@ -71,7 +88,7 @@ function axis(opts){
   let getTextElems = ()=> d3.select('#'+config.id).selectAll("text");
 
   if(!d3.select('#'+config.id).size()){
-    config.group = d3.select(config.parent)
+    config.group = d3.select('#'+config.parent)
       .append("g")
       .attr("id",config.id)
       .attr("transform",axisTranslate());

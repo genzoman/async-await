@@ -65,9 +65,26 @@ var config = {
 }
 
 
+let isGroupedData = (data)=>{
+  return Array.isArray(data[0]);
+}
 
-let getOrdinalDomain = (data,key)=>config.data;
-let getLinearDomain = ()=>[0,d3.max(config.data)];
+let getOrdinalDomain = (data,key)=>{
+  if(isGroupedData(config.data)){
+    return config.data[0];  
+  }  
+}
+
+let getLinearDomain = ()=>{
+  if(isGroupedData(config.data)){
+    return [0,d3.max(config.data[0])];  
+  }
+  else{
+    return [0,d3.max(config.data)];
+  }
+    
+}
+
 let getDomain = ()=> {
   return config.orient==="left" ? getLinearDomain() : getOrdinalDomain();
 };
@@ -105,7 +122,7 @@ function axis(opts){
   let getTextElems = ()=> d3.select('#'+config.id).selectAll("text");
 
   if(!d3.select('#'+config.id).size()){
-    config.group = d3.select(config.parent)
+    config.group = d3.select('#'+config.parent)
       .append("g")
       .attr("id",config.id)
       .attr("transform",axisTranslate());
@@ -169,10 +186,9 @@ var emitter = require("../ChartEvents");
 var getConfig = (config,opts)=>_.extend(config,opts);
 
 var axis = require("../axis/axis");
-var n = 2, // number of samples
-    m = 4; // number of series
 
-var data = d3.range(m).map(function() { return d3.range(n).map(Math.random); });
+
+var data = d3.range(4).map(function() { return d3.range(2).map(Math.random); });
 let config = {
   data: data,
   numSeries: function(){
@@ -181,53 +197,35 @@ let config = {
   ,
   numSamples:function(){
     return this.data[0].length || 1 
+  },
+  height: 400,
+  width: 800,
+  xAxis:function(opts){
+     return getConfig.call(this,this,opts);
   }
   
 }
 
-config.numSamples();
+var xConfig = config.xAxis({id: 'xAxis',parent:'svg'});
 
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var yScale = d3.scale.linear()
-    .domain([0, 1])
-    .range([height, 0]);
 
-var outerScale = d3.scale.ordinal()
-    .domain(d3.range(config.numSamples()))
-    .rangeBands([0, width], 0);
-
-var innerScale = d3.scale.ordinal()
-    .domain(d3.range(config.numSeries()))
-    .rangeBands([0, outerScale.rangeBand()]);
 
 var z = d3.scale.category10();
 
-var xAxis = d3.svg.axis()
-    .scale(outerScale)
-    .orient("bottom");
 
-var yAxis = d3.svg.axis()
-    .scale(yScale)
-    .orient("left");
     
 window.d3 = d3;
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("svg:g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// var svg = d3.select("body").append("svg")
+//     .attr("width", width + margin.left + margin.right)
+//     .attr("height", height + margin.top + margin.bottom)
+//   .append("svg:g")
+//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// svg.append("g")
-//     .attr("class", "y axis")
-//     .call(yAxis);
 
-// svg.append("g")
-//     .attr("class", "x axis")
-//     .attr("transform", "translate(0," + height + ")")
-//     .call(xAxis);
 let barConfig = ()=>{
     return {
       width: ()=>innerScale.rangeBand(),
@@ -238,21 +236,36 @@ let barConfig = ()=>{
   }
 
 
-svg.append("g").selectAll("g")
-    .data(data)
-  .enter().append("g")
-    .style("fill", function(d, i) { return z(i); })
-    .attr("transform", function(d, i) { return "translate(" + innerScale(i) + ",0)"; })
-  .selectAll("rect")
-    .data(function(d) { return d; })
-  .enter().append("rect")
-    .attr(barConfig());
+// svg.append("g").selectAll("g")
+//     .data(data)
+//   .enter().append("g")
+//     .style("fill", function(d, i) { return z(i); })
+//     .attr("transform", function(d, i) { return "translate(" + innerScale(i) + ",0)"; })
+//   .selectAll("rect")
+//     .data(function(d) { return d; })
+//   .enter().append("rect")
+//     .attr(barConfig());
 
 
 function bars(opts){
   config = getConfig(config,opts);
   
+  var yScale = d3.scale.linear()
+    .domain([0, 1])
+    .range([config.height, 0]);
+
+var outerScale = d3.scale.ordinal()
+    .domain(d3.range(config.numSamples()))
+    .rangeBands([0, config.width], 0);
+
+var innerScale = d3.scale.ordinal()
+    .domain(d3.range(config.numSeries()))
+    .rangeBands([0, outerScale.rangeBand()]);
+  
+  
+  var xAxis = axis(xConfig);
 }
+bars();
 },{"../ChartEvents":1,"../axis/axis":2,"../behaviors/horizontalResize":4,"../utils/translate":8,"d3":11,"underscore":26}],4:[function(require,module,exports){
 'use strict';
 var d3 = require('d3');
