@@ -192,12 +192,15 @@ var getConfig = (config,opts)=>_.extend(config,opts);
 
 var axis = require("../axis/axis");
 
-
-var data = d3.range(4).map(function() { return d3.range(2).map(Math.random); });
+var m = 3,
+   n = 2
+var data = d3.range(m).map(function() { return d3.range(n).map(Math.random); });
+//numSeries and numSamples need to figure out m,n and pass that to outer/inner Scales
 let config = {
   data: data,
   numSeries: function(){
-    return this.data.length;  
+    return Array.isArray(this.data[0]) ? this.data[0].length : this.data.length;
+    //return this.data.length;  
   }
   ,
   numSamples:function(){
@@ -219,7 +222,7 @@ var margin = {
 }
 var xConfig = config.xAxis(
     {
-      id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c','d']
+      id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c']
     });
 
 var yConfig = config.yAxis(
@@ -230,32 +233,19 @@ var yConfig = config.yAxis(
 
 var color = d3.scale.category10();
 
-let barConfig = ()=>{
-    return {
-      width: ()=>innerScale.rangeBand(),
-      height: yScale,
-      x: (d,i)=> outerScale(i),
-      y: (d,i)=> config.height-yScale(d)
-    }
-  }
-
-
-
-
-
 function bars(opts){
   config = getConfig(config,opts);
   
   var yScale = d3.scale.linear()
     .domain([0, 1])
     .range([config.height, 0]);
-
+//the outerScale and innerScale have hardcoded domains.  this is no bueno
 var outerScale = d3.scale.ordinal()
-    .domain(d3.range(2))
+    .domain(d3.range(n))
     .rangeBands([0, config.width], 0);
 
 var innerScale = d3.scale.ordinal()
-    .domain(d3.range(4))
+    .domain(d3.range(m))
     .rangeBands([0, outerScale.rangeBand()]);
   
   //
