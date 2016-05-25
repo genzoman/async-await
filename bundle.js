@@ -216,7 +216,7 @@ let config = {
 
 var xConfig = config.xAxis(
     {
-      id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c']
+      id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c','d']
     });
 
 var yConfig = config.yAxis(
@@ -295,7 +295,11 @@ var innerScale = d3.scale.ordinal()
   .enter()
     .append("g")
     .style("fill", function(d, i) { return z(i); })
-    .attr("transform", function(d, i) { return "translate(" + innerScale(i) + ",0)"; })
+    .attr("transform", function(d, i) { 
+      //return "translate(" + innerScale(i) + ",0)";
+      return `translate(${innerScale(i)},0)`; 
+      
+    })
   .selectAll("rect")
     .data(function(d) { return d; })
   .enter().append("rect")
