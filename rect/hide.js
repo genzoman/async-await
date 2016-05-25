@@ -8,9 +8,7 @@ rect.insert("rect").attr({
   fill: "blue"
 });
 
-setTimeout(function(){
-  hide('horizontal','leftRight');
-},2000);
+
 function hide(orient,dir){
   if(orient==="vertical"){
     if(dir==="bottomUp"){

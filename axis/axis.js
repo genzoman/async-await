@@ -21,7 +21,13 @@ var config = {
   drag: null,
   group: '',
   orient: 'left',
-  hasDrag: true
+  hasDrag: true,
+  numSamples:()=>{
+    return this.data[0].length || 1
+  },
+  numSeries:()=>{
+    return this.data.length || 1
+  }
 }
 
 
@@ -58,7 +64,7 @@ let getAxis =()=> {
     .ticks(10)
     .tickSize(1);
 }
-window.axis;
+
 function axis(opts){
   config = getConfig(config,opts);
 
@@ -117,7 +123,5 @@ function axis(opts){
 
   return axis;
 }
-
-
 
 module.exports = axis;
