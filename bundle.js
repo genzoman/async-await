@@ -201,7 +201,7 @@ let config = {
   }
   ,
   numSamples:function(){
-    return this.data[0].length || 1 
+    return this.data.length || 1 
   },
   height: 400,
   width: 800,
@@ -263,11 +263,11 @@ function bars(opts){
     .range([config.height, 0]);
 
 var outerScale = d3.scale.ordinal()
-    .domain(d3.range(config.numSamples()))
+    .domain(d3.range(2))
     .rangeBands([0, config.width], 0);
 
 var innerScale = d3.scale.ordinal()
-    .domain(d3.range(config.numSeries()))
+    .domain(d3.range(4))
     .rangeBands([0, outerScale.rangeBand()]);
   
   //
@@ -287,13 +287,14 @@ var innerScale = d3.scale.ordinal()
   var xAxis = axis(xConfig);
   var yAxis = axis(yConfig);
   var translate_ = `translate(${margin.left},${margin.top})`;
-   var g = d3.select("svg").append("g").attr("id","group");
+   var g = d3.select("svg").append("g").attr("id","group").attr("transform","translate(100,-40)");
     
   g.selectAll("g")
     .attr("transform",translate_)
     .data(data)
   .enter()
     .append("g")
+    
     .style("fill", function(d, i) { return z(i); })
     .attr("transform", function(d, i) { 
       //return "translate(" + innerScale(i) + ",0)";
