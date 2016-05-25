@@ -213,7 +213,10 @@ let config = {
   }
   
 }
-
+var margin = {
+  left: 50,
+  top:50
+}
 var xConfig = config.xAxis(
     {
       id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c','d']
@@ -224,30 +227,15 @@ var yConfig = config.yAxis(
     id: 'yAxis', parent: 'svg',orient: 'left',data: data
   });
 
-var margin = {top: 20, right: 30, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
 
-
-
-var z = d3.scale.category10();
-
-
-    
-window.d3 = d3;
-// var svg = d3.select("body").append("svg")
-//     .attr("width", width + margin.left + margin.right)
-//     .attr("height", height + margin.top + margin.bottom)
-//   .append("svg:g")
-//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+var color = d3.scale.category10();
 
 let barConfig = ()=>{
     return {
       width: ()=>innerScale.rangeBand(),
       height: yScale,
       x: (d,i)=> outerScale(i),
-      y: (d,i)=> height-yScale(d)
+      y: (d,i)=> config.height-yScale(d)
     }
   }
 
@@ -298,15 +286,12 @@ var innerScale = d3.scale.ordinal()
   .enter()
     .append("g")
     
-    .style("fill", function(d, i) { return z(i); })
-    .attr("transform", function(d, i) { 
-      //return "translate(" + innerScale(i) + ",0)";
-      return `translate(${innerScale(i)},0)`; 
-      
-    })
+    .style("fill", (d, i)=> color(i))
+    .attr("transform", (d, i)=>`translate(${innerScale(i)},0)`)
   .selectAll("rect")
-    .data(function(d) { return d; })
-  .enter().append("rect")
+    .data(d=>d)
+  .enter()
+    .append("rect")
     .attr(barConfig());
     
   bars.xAxis = ()=>xAxis;
