@@ -7,6 +7,8 @@ var getConfig = (config,opts)=>_.extend(config,opts);
 
 var axis = require("../axis/axis");
 
+module.exports = bars;
+
 var samples = 3,
    n = 2
 var data = d3.range(samples).map(function() { return d3.range(n).map(Math.random); });
@@ -56,7 +58,8 @@ function bars(opts){
   var yScale = d3.scale.linear()
     .domain([0, 1])
     .range([config.height, 0]);
-//the outerScale and innerScale have hardcoded domains.  this is no bueno
+
+
 var outerScale = d3.scale.ordinal()
     .domain(d3.range(series))
     .rangeBands([0, config.width], 0);
@@ -107,4 +110,3 @@ var innerScale = d3.scale.ordinal()
   return bars;
 }
 
-bars();
