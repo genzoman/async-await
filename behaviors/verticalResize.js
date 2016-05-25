@@ -12,7 +12,10 @@ function verticalResize(opts){
     factor = isBottomDrag ? 1 : -1,
     event = opts.event || d3.event;
 
-    var translate_ = isBottomDrag ? `translate(${currTransform[0]},${currTransform[1] + mouse[1] + (factor * event.dy)})`: null;
+    var translate_ = isBottomDrag ? 
+      `translate(${currTransform[0]},${currTransform[1] +  (factor * event.dy)})`
+        : null;
+        
 
     let getTopDrag = ()=>{
 
