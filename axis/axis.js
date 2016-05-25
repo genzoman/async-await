@@ -38,12 +38,17 @@ let isGroupedData = (data)=>{
 let getOrdinalDomain = (data,key)=>{
   if(isGroupedData(config.data)){
     return config.data[0];  
-  }  
+  }
+  return config.data;  
 }
 
 let getLinearDomain = ()=>{
   if(isGroupedData(config.data)){
-    return [0,d3.max(config.data[0])];  
+    //return [0,d3.max(config.data[0])];
+    var max = d3.max(config.data,(arr)=>{
+      return d3.max(arr);
+    });
+    return [0,max];   
   }
   else{
     return [0,d3.max(config.data)];

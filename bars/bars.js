@@ -22,11 +22,22 @@ let config = {
   width: 800,
   xAxis:function(opts){
      return getConfig.call(this,this,opts);
+  },
+  yAxis:(opts)=>{
+    return getConfig.call(this,this,opts);
   }
   
 }
 
-var xConfig = config.xAxis({id: 'xAxis',parent:'svg'});
+var xConfig = config.xAxis(
+    {
+      id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c']
+    });
+
+var yConfig = config.yAxis(
+  {
+    id: 'yAxis', parent: 'svg',orient: 'left',data: data
+  });
 
 var margin = {top: 20, right: 30, bottom: 30, left: 40},
     width = 960 - margin.left - margin.right,
@@ -56,15 +67,7 @@ let barConfig = ()=>{
   }
 
 
-// svg.append("g").selectAll("g")
-//     .data(data)
-//   .enter().append("g")
-//     .style("fill", function(d, i) { return z(i); })
-//     .attr("transform", function(d, i) { return "translate(" + innerScale(i) + ",0)"; })
-//   .selectAll("rect")
-//     .data(function(d) { return d; })
-//   .enter().append("rect")
-//     .attr(barConfig());
+
 
 
 function bars(opts){
@@ -82,7 +85,36 @@ var innerScale = d3.scale.ordinal()
     .domain(d3.range(config.numSeries()))
     .rangeBands([0, outerScale.rangeBand()]);
   
+  //
+  let barConfig = ()=>{
+    return {
+      width: ()=>innerScale.rangeBand(),
+      height: yScale,
+      x: (d,i)=> outerScale(i),
+      y: (d,i)=> {
+       return height-yScale(d); 
+      }
+    }
+  }
+
+  //
   
   var xAxis = axis(xConfig);
+  var yAxis = axis(yConfig);
+  var translate_ = `translate(${margin.left},${margin.top})`;
+   var g = d3.select("svg").append("g").attr("id","group");
+    
+  g.selectAll("g")
+    .attr("transform",translate_)
+    .data(data)
+  .enter()
+    .append("g")
+    .style("fill", function(d, i) { return z(i); })
+    .attr("transform", function(d, i) { return "translate(" + innerScale(i) + ",0)"; })
+  .selectAll("rect")
+    .data(function(d) { return d; })
+  .enter().append("rect")
+    .attr(barConfig());
+  
 }
 bars();
