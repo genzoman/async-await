@@ -75,8 +75,8 @@ let linearScale = ()=>{
   return d3.scale.linear().range(getRange()).domain(getDomain());
 }
 let axisTranslate = ()=>{
-  return config.orient==="bottom" ? translate(100,10+config.height)
-    : translate(100,10);
+  return config.orient==="bottom" ? translate(100,config.height)
+    : translate(100,0);
 }
 
 let getAxis =()=> {
