@@ -273,8 +273,13 @@ var innerScale = d3.scale.ordinal()
     width: config.width,
     height: config.height
   });
+  
+  let yConfig = getConfig(config.yAxis,{
+    width: config.width,
+    height: config.height
+  });
   var xAxis = axis(xConfig);
-  var yAxis = axis(config.yAxis);
+  var yAxis = axis(yConfig);
   var translate_ = `translate(${margin.left},${margin.top})`;
    var g = d3.select("svg")
     .append("g")
@@ -439,6 +444,16 @@ bars({
         parent: 'svg',
         orient: 'bottom',
         hasDrag:true
+    },
+    yAxis:{
+        id: 'yAxis',
+        parent: 'svg',
+        orient: 'left',
+        data:[
+            [1,3],
+            [2,5],
+            [.5,2.5]
+        ]
     }
 });
 

@@ -12,5 +12,15 @@ bars({
         parent: 'svg',
         orient: 'bottom',
         hasDrag:true
+    },
+    yAxis:{
+        id: 'yAxis',
+        parent: 'svg',
+        orient: 'left',
+        data:[
+            [1,3],
+            [2,5],
+            [.5,2.5]
+        ]
     }
 });
