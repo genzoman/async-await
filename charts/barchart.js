@@ -1,9 +1,12 @@
+//barchart.js
+'use strict';
 var bars = require("../bars/bars");
-module.exports = chart;
-function chart(){
-    bars();    
+
+function chart(opts){
+    chart.bars = bars(opts);
+    return chart;
 }
-bars({
+var config = {
     height: 500,
     width: 500,
     xAxis:{
@@ -19,8 +22,10 @@ bars({
         orient: 'left',
         data:[
             [1,3],
-            [2,5],
+            [2,3],
             [.5,2.5]
         ]
     }
-});
+}
+chart(config);
+module.exports = chart;

@@ -2,15 +2,17 @@
 //ChartEvents.js
 var ee = require("event-emitter");
 var emitter = ee({});
-//var axis = require("./axis/axis");
-var bars = require("./bars/bars");
 
-emitter.on('onButtonClick',(time)=>{
+//var chart = require("./charts/barchart");
+
+emitter.on('onButtonClick',function(time){
   
 });
 
 emitter.on('onResize',function(data){
-  console.log("resize!",data);
+  //chart(data);
+  var chart = require("./charts/barchart");
+  chart(data);
 });
 
 emitter.on('onFontChange',function(data){

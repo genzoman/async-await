@@ -1,7 +1,10 @@
+'use strict';
+//resize.js
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
 var emitter = require("../ChartEvents");
+
 
 module.exports = resize;
 function resize(axis,config){
@@ -22,6 +25,7 @@ function resize(axis,config){
         var data = verticalResize.call(this,{
           height: config.height
         });
+        
         emitter.emit('onResize',data); 
       },
       "dragend":()=>{}

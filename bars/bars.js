@@ -17,7 +17,7 @@ let config = {
   data: data,
   numSeries: function(){
     return Array.isArray(this.data[0]) ? this.data[0].length : this.data.length;
-    //return this.data.length;  
+      
   }
   ,
   numSamples:function(){
@@ -25,13 +25,7 @@ let config = {
   },
   height: 400,
   width: 800
-  // ,
-  // xAxis:function(opts){
-  //    return getConfig.call(this,this,opts);
-  // },
-  // yAxis:(opts)=>{
-  //   return getConfig.call(this,this,opts);
-  // }
+  
   
 }
 
@@ -40,16 +34,6 @@ var margin = {
   left: 50,
   top:50
 }
-// var xConfig = config.xAxis(
-//     {
-//       id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c']
-//     });
-
-// var yConfig = config.yAxis(
-//   {
-//     id: 'yAxis', parent: 'svg',orient: 'left',data: data
-//   });
-
 
 var color = d3.scale.category10();
 
@@ -91,8 +75,11 @@ var innerScale = d3.scale.ordinal()
     width: config.width,
     height: config.height
   });
+  
   var xAxis = axis(xConfig);
   var yAxis = axis(yConfig);
+  //
+  
   var translate_ = `translate(${margin.left},${margin.top})`;
    var g = d3.select("svg")
     .append("g")

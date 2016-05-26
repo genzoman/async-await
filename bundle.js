@@ -3,15 +3,17 @@
 //ChartEvents.js
 var ee = require("event-emitter");
 var emitter = ee({});
-//var axis = require("./axis/axis");
-var bars = require("./bars/bars");
 
-emitter.on('onButtonClick',(time)=>{
+//var chart = require("./charts/barchart");
+
+emitter.on('onButtonClick',function(time){
   
 });
 
 emitter.on('onResize',function(data){
-  console.log("resize!",data);
+  //chart(data);
+  var chart = require("./charts/barchart");
+  chart(data);
 });
 
 emitter.on('onFontChange',function(data){
@@ -33,7 +35,7 @@ emitter.on('onOrientChange',function(data){
 });
 module.exports = emitter;
 
-},{"./bars/bars":3,"event-emitter":25}],2:[function(require,module,exports){
+},{"./charts/barchart":7,"event-emitter":25}],2:[function(require,module,exports){
 'use strict';
 
 var d3 = require("d3");
@@ -204,7 +206,7 @@ let config = {
   data: data,
   numSeries: function(){
     return Array.isArray(this.data[0]) ? this.data[0].length : this.data.length;
-    //return this.data.length;  
+      
   }
   ,
   numSamples:function(){
@@ -212,13 +214,7 @@ let config = {
   },
   height: 400,
   width: 800
-  // ,
-  // xAxis:function(opts){
-  //    return getConfig.call(this,this,opts);
-  // },
-  // yAxis:(opts)=>{
-  //   return getConfig.call(this,this,opts);
-  // }
+  
   
 }
 
@@ -227,16 +223,6 @@ var margin = {
   left: 50,
   top:50
 }
-// var xConfig = config.xAxis(
-//     {
-//       id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c']
-//     });
-
-// var yConfig = config.yAxis(
-//   {
-//     id: 'yAxis', parent: 'svg',orient: 'left',data: data
-//   });
-
 
 var color = d3.scale.category10();
 
@@ -278,8 +264,11 @@ var innerScale = d3.scale.ordinal()
     width: config.width,
     height: config.height
   });
+  
   var xAxis = axis(xConfig);
   var yAxis = axis(yConfig);
+  //
+  
   var translate_ = `translate(${margin.left},${margin.top})`;
    var g = d3.select("svg")
     .append("g")
@@ -356,10 +345,13 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
 }
 
 },{"../utils/translate":8,"d3":11,"underscore":26}],5:[function(require,module,exports){
+'use strict';
+//resize.js
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
 var emitter = require("../ChartEvents");
+
 
 module.exports = resize;
 function resize(axis,config){
@@ -380,6 +372,7 @@ function resize(axis,config){
         var data = verticalResize.call(this,{
           height: config.height
         });
+        
         emitter.emit('onResize',data); 
       },
       "dragend":()=>{}
@@ -430,12 +423,15 @@ function verticalResize(opts){
 module.exports = verticalResize;
 
 },{"../utils/translate":8,"d3":11}],7:[function(require,module,exports){
+//barchart.js
+'use strict';
 var bars = require("../bars/bars");
-module.exports = chart;
-function chart(){
-    bars();    
+
+function chart(opts){
+    chart.bars = bars(opts);
+    return chart;
 }
-bars({
+var config = {
     height: 500,
     width: 500,
     xAxis:{
@@ -451,11 +447,13 @@ bars({
         orient: 'left',
         data:[
             [1,3],
-            [2,5],
+            [2,3],
             [.5,2.5]
         ]
     }
-});
+}
+chart(config);
+module.exports = chart;
 
 },{"../bars/bars":3}],8:[function(require,module,exports){
 
