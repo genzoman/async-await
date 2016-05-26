@@ -82,8 +82,11 @@ var innerScale = d3.scale.ordinal()
   }
 
   //
-  let xConfig = getConfig(config.xAxis,config);
-  var xAxis = axis(config.xAxis);
+  let xConfig = getConfig(config.xAxis,{
+    width: config.width,
+    height: config.height
+  });
+  var xAxis = axis(xConfig);
   var yAxis = axis(config.yAxis);
   var translate_ = `translate(${margin.left},${margin.top})`;
    var g = d3.select("svg")

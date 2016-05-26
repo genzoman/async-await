@@ -46,8 +46,8 @@ var config = {
   domain:null,
   barPadding:null,
   parent:null,
-  width: 200,
-  height:200,
+  width: 0,
+  height:0,
   font:{
     'font-size': '12pt',
     'fill': 'blue'
@@ -269,8 +269,11 @@ var innerScale = d3.scale.ordinal()
   }
 
   //
-  let xConfig = getConfig(config.xAxis,config);
-  var xAxis = axis(config.xAxis);
+  let xConfig = getConfig(config.xAxis,{
+    width: config.width,
+    height: config.height
+  });
+  var xAxis = axis(xConfig);
   var yAxis = axis(config.yAxis);
   var translate_ = `translate(${margin.left},${margin.top})`;
    var g = d3.select("svg")
