@@ -24,30 +24,31 @@ let config = {
     return this.data.length || 1 
   },
   height: 400,
-  width: 800,
-  xAxis:function(opts){
-     return getConfig.call(this,this,opts);
-  },
-  yAxis:(opts)=>{
-    return getConfig.call(this,this,opts);
-  }
+  width: 800
+  // ,
+  // xAxis:function(opts){
+  //    return getConfig.call(this,this,opts);
+  // },
+  // yAxis:(opts)=>{
+  //   return getConfig.call(this,this,opts);
+  // }
   
 }
-console.log("numSamples",config.numSamples());
+
 var series = config.numSeries();
 var margin = {
   left: 50,
   top:50
 }
-var xConfig = config.xAxis(
-    {
-      id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c']
-    });
+// var xConfig = config.xAxis(
+//     {
+//       id: 'xAxis',parent:'svg', orient: "bottom", data: ['a','b','c']
+//     });
 
-var yConfig = config.yAxis(
-  {
-    id: 'yAxis', parent: 'svg',orient: 'left',data: data
-  });
+// var yConfig = config.yAxis(
+//   {
+//     id: 'yAxis', parent: 'svg',orient: 'left',data: data
+//   });
 
 
 var color = d3.scale.category10();
@@ -81,9 +82,9 @@ var innerScale = d3.scale.ordinal()
   }
 
   //
-  
-  var xAxis = axis(xConfig);
-  var yAxis = axis(yConfig);
+  let xConfig = getConfig(config.xAxis,config);
+  var xAxis = axis(config.xAxis);
+  var yAxis = axis(config.yAxis);
   var translate_ = `translate(${margin.left},${margin.top})`;
    var g = d3.select("svg")
     .append("g")

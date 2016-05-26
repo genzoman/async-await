@@ -10,8 +10,8 @@ var config = {
   domain:null,
   barPadding:null,
   parent:null,
-  width: 200,
-  height:200,
+  width: 0,
+  height:0,
   font:{
     'font-size': '12pt',
     'fill': 'blue'

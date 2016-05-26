@@ -1,6 +1,7 @@
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
+var emitter = require("../ChartEvents");
 
 module.exports = resize;
 function resize(axis,config){
@@ -8,18 +9,20 @@ function resize(axis,config){
     dragObj = {
       "dragstart":()=>{},
       "drag":function(){
-        axis(horizontalResize.call(this,{width:config.width}));
+        var data = horizontalResize.call(this,{width:config.width});
+        emitter.emit('onResize',data);
       },
       "dragend":()=>{}
     }
     :
     dragObj = {
       "dragstart":()=>{},
-      "drag":function shrink(){
-
-        axis(verticalResize.call(this,{
+      "drag":function(){
+        
+        var data = verticalResize.call(this,{
           height: config.height
-        }));
+        });
+        emitter.emit('onResize',data); 
       },
       "dragend":()=>{}
     }
