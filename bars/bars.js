@@ -61,7 +61,8 @@ var innerScale = d3.scale.ordinal()
       x: (d,i)=> outerScale(i),
       y: (d,i)=> {
        return config.height-yScale(d); 
-      }
+      },
+      "class": "rect"
     }
   }
 
@@ -81,17 +82,21 @@ var innerScale = d3.scale.ordinal()
   //
   
   var translate_ = `translate(${margin.left},${margin.top})`;
+   if(d3.select('#'+config.id).size()){
+      d3.select('#'+config.id).remove();
+   }  
+   
    var g = d3.select("svg")
     .append("g")
-    .attr("id","group")
+    .attr("id",config.id)
     .attr("transform","translate(100,0)");
     
-  g.selectAll("g")
+  
+  let bars = g.selectAll("g")
     .attr("transform",translate_)
     .data(data)
   .enter()
     .append("g")
-    
     .style("fill", (d, i)=> color(i))
     .attr("transform", (d, i)=>`translate(${innerScale(i)},0)`)
   .selectAll("rect")
@@ -99,6 +104,7 @@ var innerScale = d3.scale.ordinal()
   .enter()
     .append("rect")
     .attr(barConfig());
+  
     
   bars.xAxis = ()=>xAxis;
   bars.yAxis = ()=>yAxis;

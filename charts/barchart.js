@@ -9,6 +9,7 @@ function chart(opts){
 var config = {
     height: 500,
     width: 500,
+    id: 'bars',
     xAxis:{
         data: ['a','b','c'],
         id: 'xAxis',
