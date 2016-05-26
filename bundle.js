@@ -118,7 +118,7 @@ let getAxis =()=> {
     .scale(getScale())
     .orient(config.orient)
     .ticks(10)
-    .tickSize(1);
+    .tickSize(5);
 }
 
 function axis(opts){
@@ -348,8 +348,9 @@ var translate_ = isRightDrag ? `translate(${currTransform[0]
 var d3 = require('d3');
 var horizontalResize = require('./horizontalResize');
 var verticalResize = require('./verticalResize');
-module.exports = shrink;
-function shrink(axis,config){
+
+module.exports = resize;
+function resize(axis,config){
   var dragObj = (config.orient==="bottom" || config.orient==="top") ?
     dragObj = {
       "dragstart":()=>{},

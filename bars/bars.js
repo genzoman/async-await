@@ -11,7 +11,7 @@ module.exports = bars;
 
 var samples = 3,
    n = 2
-var data = d3.range(samples).map(function() { return d3.range(n).map(Math.random); });
+var data = d3.range(samples).map(_=> d3.range(n).map(Math.random));
 //numSeries and numSamples need to figure out m,n and pass that to outer/inner Scales
 let config = {
   data: data,

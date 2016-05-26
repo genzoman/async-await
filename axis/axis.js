@@ -84,7 +84,7 @@ let getAxis =()=> {
     .scale(getScale())
     .orient(config.orient)
     .ticks(10)
-    .tickSize(1);
+    .tickSize(5);
 }
 
 function axis(opts){
