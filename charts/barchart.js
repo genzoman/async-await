@@ -1,7 +1,7 @@
 //barchart.js
 'use strict';
 var bars = require("../bars/bars");
-
+var d3 = require("d3");
 function chart(opts){
     chart.bars = bars(opts);
     return chart;
@@ -15,7 +15,8 @@ var config = {
         id: 'xAxis',
         parent: 'svg',
         orient: 'bottom',
-        hasDrag:true
+        hasDrag:true,
+        group: d3.select('#xAxis')
     },
     yAxis:{
         id: 'yAxis',
@@ -25,7 +26,8 @@ var config = {
             [1,3],
             [2,3],
             [.5,2.5]
-        ]
+        ],
+        group: d3.select('#yAxis')
     }
 }
 chart(config);

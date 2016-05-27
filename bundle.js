@@ -112,10 +112,8 @@ let ordinalScale = ()=>{
 let linearScale = ()=>{
   return d3.scale.linear().range(getRange()).domain(getDomain());
 }
-let axisTranslate = ()=>{
-  return config.orient==="bottom" ? translate(100,config.height)
-    : translate(100,0);
-}
+let axisTranslate = ()=> config.orient==="bottom" ? translate(100,config.height): translate(100,0);
+
 
 let getAxis =()=> {
   return d3.svg.axis()
@@ -140,16 +138,13 @@ function axis(opts){
 
   }
   else{
-    if(config.translate)
-      return config.group
-        .call(getAxis())
-        .attr("transform",config.translate);
-    else{
+     config.group
+       .attr("transform",axisTranslate());
+       config.group.call(getAxis());
+    
       axis.drag();
       axis.font();
-      return config.group.call(getAxis());
-    }
-
+    
   }
 
   axis.font = function(){
@@ -260,12 +255,12 @@ var innerScale = d3.scale.ordinal()
     width: config.width,
     height: config.height
   });
-  
+  xConfig.group = d3.select('#'+xConfig.id);
   let yConfig = getConfig(config.yAxis,{
     width: config.width,
     height: config.height
   });
-  
+  yConfig.group = d3.select('#'+yConfig.id);
   var xAxis = axis(xConfig);
   var yAxis = axis(yConfig);
   //
@@ -432,7 +427,7 @@ module.exports = verticalResize;
 //barchart.js
 'use strict';
 var bars = require("../bars/bars");
-
+var d3 = require("d3");
 function chart(opts){
     chart.bars = bars(opts);
     return chart;
@@ -446,7 +441,8 @@ var config = {
         id: 'xAxis',
         parent: 'svg',
         orient: 'bottom',
-        hasDrag:true
+        hasDrag:true,
+        group: d3.select('#xAxis')
     },
     yAxis:{
         id: 'yAxis',
@@ -456,13 +452,14 @@ var config = {
             [1,3],
             [2,3],
             [.5,2.5]
-        ]
+        ],
+        group: d3.select('#yAxis')
     }
 }
 chart(config);
 module.exports = chart;
 
-},{"../bars/bars":3}],8:[function(require,module,exports){
+},{"../bars/bars":3,"d3":11}],8:[function(require,module,exports){
 
 module.exports = (x,y)=>{
   return 'translate('+x+','+y+')';

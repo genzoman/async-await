@@ -74,10 +74,8 @@ let ordinalScale = ()=>{
 let linearScale = ()=>{
   return d3.scale.linear().range(getRange()).domain(getDomain());
 }
-let axisTranslate = ()=>{
-  return config.orient==="bottom" ? translate(100,config.height)
-    : translate(100,0);
-}
+let axisTranslate = ()=> config.orient==="bottom" ? translate(100,config.height): translate(100,0);
+
 
 let getAxis =()=> {
   return d3.svg.axis()
@@ -102,16 +100,13 @@ function axis(opts){
 
   }
   else{
-    if(config.translate)
-      return config.group
-        .call(getAxis())
-        .attr("transform",config.translate);
-    else{
+     config.group
+       .attr("transform",axisTranslate());
+       config.group.call(getAxis());
+    
       axis.drag();
       axis.font();
-      return config.group.call(getAxis());
-    }
-
+    
   }
 
   axis.font = function(){

@@ -71,12 +71,12 @@ var innerScale = d3.scale.ordinal()
     width: config.width,
     height: config.height
   });
-  
+  xConfig.group = d3.select('#'+xConfig.id);
   let yConfig = getConfig(config.yAxis,{
     width: config.width,
     height: config.height
   });
-  
+  yConfig.group = d3.select('#'+yConfig.id);
   var xAxis = axis(xConfig);
   var yAxis = axis(yConfig);
   //
